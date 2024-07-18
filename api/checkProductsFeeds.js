@@ -390,7 +390,7 @@ async function manageProductProcessingFeed(config, totalPages) {
 
     //const divisionOfPages = 10;
 
-    const maxSegmentSize = 20;
+    const maxSegmentSize = 15;
     let divisionOfPages = Math.ceil(totalPages / maxSegmentSize);
 
 
