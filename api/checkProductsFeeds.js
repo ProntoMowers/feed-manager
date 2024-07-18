@@ -84,12 +84,18 @@ async function fetchWithRateLimitInfo(url, connection, retries = 3, backoff = 10
                 console.error('Error fetching data:', error.message, 'Status code:', status);
                 throw error;
             }
+        } else if (error.code === 'EADDRNOTAVAIL' && retries > 0) {
+            // Manejar el error EADDRNOTAVAIL
+            console.log(`Address not available, retrying in ${backoff} ms...`);
+            await new Promise(resolve => setTimeout(resolve, backoff));
+            return fetchWithRateLimitInfo(url, connection, retries - 1, backoff * 2); // Reintentar con backoff exponencial
         } else {
             console.error('Error fetching data:', error.message);
             throw error;
         }
     }
 }
+
 
 
 /*
@@ -152,17 +158,16 @@ async function checkCustomFieldFeed(config, productId) {
         const response = await fetchWithRateLimitInfo(url, connection);
 
         // Obtener y manejar los límites de tasa
-        const { requestsQuota, requestsLeft, resetTime } = extractRateLimitInfo(
-            response.rateLimitInfo
-        );
+        const { requestsQuota, requestsLeft, resetTime } = extractRateLimitInfo(response.rateLimitInfo);
 
         // Calcular si estamos por encima del 85% del límite
         if (requestsLeft <= requestsQuota * 0.15) {
-            console.log("Ha llegado al 85% del limite")
+            console.log("Ha llegado al 85% del limite");
             await new Promise((resolve) => setTimeout(resolve, resetTime));
         }
 
         if (response.data) {
+            // Verificar los grupos de campos personalizados según la lógica AND/OR
             return customFieldGroups.every((group) => {
                 if (group.logic === "AND") {
                     return group.fields.every((customField) =>
@@ -188,14 +193,21 @@ async function checkCustomFieldFeed(config, productId) {
             return false;
         }
     } catch (error) {
-        console.error(
-            "Error fetching custom fields for product:",
-            productId,
-            error
-        );
-        return false;
+        if (error.code === 'EADDRNOTAVAIL') {
+            console.error(`Error de dirección no disponible al buscar campos personalizados para el producto: ${productId}. Reintentando...`);
+            await new Promise((resolve) => setTimeout(resolve, 1000)); // Esperar un momento antes de reintentar
+            return checkCustomFieldFeed(config, productId); // Reintentar la función
+        } else {
+            console.error(
+                "Error fetching custom fields for product:",
+                productId,
+                error.message
+            );
+            return false;
+        }
     }
 }
+
 
 
 /*
