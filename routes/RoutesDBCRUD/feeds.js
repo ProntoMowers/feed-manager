@@ -327,16 +327,22 @@ routerFeeds.get("/feeds/synchronize/:feedId", authenticateToken, async (req, res
             console.log("Access Token: ", accessToken);
 
             const baseUrl = `https://api.bigcommerce.com/stores/${storeHash}/v3/catalog/products`;
-            const url = await buildQueryUrl(baseUrl, formula);
+            const urlResult = await buildQueryUrl(baseUrl, formula);
 
             const config = {
+                accessToken: accessToken,
+                storeHash: storeHash,
+                domain: feed.domain,
+                apiInfo: url
+            };
+            
+            const configBase = {
                 accessToken: accessToken,
                 storeHash: storeHash,
                 client_email: feed.client_email,
                 private_key: privateKey,
                 merchantId: merchantId,
-                domain: feed.domain,
-                apiInfo: url
+                domain: domain
             };
 
             const configCron = {
@@ -352,12 +358,18 @@ routerFeeds.get("/feeds/synchronize/:feedId", authenticateToken, async (req, res
             setImmediate(async () => {
                 try {
 
-                    const conteoPages = await countPagesNew(config);
-                    console.log("Conteo: ", conteoPages);
-                    const conteoByTipo = await manageProductProcessingFeed(config, conteoPages);
-
-
-                    console.log("Conteo: ", conteoPages);
+                    for (const url of urlResult.urls) {
+                        const config = {
+                            ...configBase,
+                            apiInfo: { url: [url], customFields:urlResult.customFields }
+                        };
+                        console.log("Config info: ", config);
+    
+                        const conteoPages = await countPagesNew(config);
+                        console.log("Conteo: ", conteoPages);
+                        const conteoByTipo = await manageProductProcessingFeed(config, conteoPages);
+                        console.log("Conteo por tipo: ", conteoByTipo);
+                    }
 
                     const WebHooks = await fetchWebHooks(config);
 
