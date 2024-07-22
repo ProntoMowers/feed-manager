@@ -364,7 +364,7 @@ async function buildQueryUrl(baseUrl, expression) {
   const customFieldGroups = organizeCustomFields(expression);
 
   return {
-      urls: urls.map(url => url.replace('?&', '?').replace('&&', '&').replace('|&', '|')),
+      url: urls.map(url => url.replace('?&', '?').replace('&&', '&').replace('|&', '|')),
       customFields: customFieldGroups
   };
 }
