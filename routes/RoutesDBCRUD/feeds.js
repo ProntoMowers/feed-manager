@@ -342,7 +342,7 @@ routerFeeds.get("/feeds/synchronize/:feedId", authenticateToken, async (req, res
                 client_email: feed.client_email,
                 private_key: privateKey,
                 merchantId: merchantId,
-                domain: domain
+                domain: feed.domain
             };
 
             const configCron = {
