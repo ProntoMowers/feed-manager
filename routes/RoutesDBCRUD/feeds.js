@@ -333,7 +333,7 @@ routerFeeds.get("/feeds/synchronize/:feedId", authenticateToken, async (req, res
                 accessToken: accessToken,
                 storeHash: storeHash,
                 domain: feed.domain,
-                apiInfo: url
+                apiInfo: urlResult
             };
             
             const configBase = {
@@ -351,8 +351,8 @@ routerFeeds.get("/feeds/synchronize/:feedId", authenticateToken, async (req, res
                 isActive: feed.isActive
             }
 
-            console.log("Url Formada: ", JSON.stringify(url.customFields, null, 2));
-            console.log("Url Formada: ", url.url);
+            console.log("Url Formada: ", JSON.stringify(urlResult.customFields, null, 2));
+            console.log("Url Formada: ", urlResult.url);
 
             // Ejecutar las operaciones asíncronas en segundo plano
             setImmediate(async () => {
