@@ -295,19 +295,19 @@ async function createCronJob(feedId, configCron) {
 
 async function buildQueryUrl(baseUrl, expression) {
   if (!expression) {
-    throw new Error("La expresión es undefined o null");
+      throw new Error("La expresión es undefined o null");
   }
 
   const fields = [
-    "type",
-    "price",
-    "is_featured",
-    "availability",
-    "is_visible",
-    "is_free_shipping",
-    "id",
-    "weight",
-    "condition",
+      "type",
+      "price",
+      "is_featured",
+      "availability",
+      "is_visible",
+      "is_free_shipping",
+      "id",
+      "weight",
+      "condition",
   ];
   const queryParams = [];
   let currentGroup = [];
@@ -315,63 +315,78 @@ async function buildQueryUrl(baseUrl, expression) {
 
   const conditions = expression.split(/(AND|OR|\(|\))/).map((cond) => cond.trim()).filter(cond => cond);
 
+  const fieldOccurrences = {};
+
   conditions.forEach((condition, index) => {
-    if (condition === "(" || condition === ")") {
-      // Ignorar paréntesis
-      return;
-    } else if (condition === "AND" || condition === "OR") {
-      lastLogicOperator = condition;
-      if (currentGroup.length > 0) {
-        queryParams.push(currentGroup.join("&"));
-        currentGroup = [];
-      }
-      queryParams.push(condition);
-    } else {
-      // Eliminar corchetes y paréntesis
-      condition = condition.replace(/[\[\]\(\)]/g, "");
+      if (condition === "(" || condition === ")") {
+          // Ignorar paréntesis
+          return;
+      } else if (condition === "AND" || condition === "OR") {
+          lastLogicOperator = condition;
+          if (currentGroup.length > 0) {
+              queryParams.push(currentGroup.join("&"));
+              currentGroup = [];
+          }
+          queryParams.push(condition);
+      } else {
+          // Eliminar corchetes y paréntesis
+          condition = condition.replace(/[\[\]\(\)]/g, "");
 
-      const [field, operator, value] = condition.split(/\s+/);
+          const [field, operator, value] = condition.split(/\s+/);
 
-      if (fields.includes(field)) {
-        if (operator === "=") {
-          currentGroup.push(`${field}=${value}`);
-        } else if (operator === "!=") {
-          currentGroup.push(`${field}:not=${value}`);
-        } else if ([">", "<", ">=", "<="].includes(operator)) {
-          const opMap = {
-            ">": "greater",
-            "<": "less",
-            ">=": "min",
-            "<=": "max",
-          };
-          currentGroup.push(`${field}:${opMap[operator]}=${value}`);
-        }
+          if (fields.includes(field)) {
+              if (!fieldOccurrences[field]) {
+                  fieldOccurrences[field] = [];
+              }
+              if (operator === "=") {
+                  fieldOccurrences[field].push(`${field}=${value}`);
+              } else if (operator === "!=") {
+                  fieldOccurrences[field].push(`${field}:not=${value}`);
+              } else if ([">", "<", ">=", "<="].includes(operator)) {
+                  const opMap = {
+                      ">": "greater",
+                      "<": "less",
+                      ">=": "min",
+                      "<=": "max",
+                  };
+                  fieldOccurrences[field].push(`${field}:${opMap[operator]}=${value}`);
+              }
+          }
       }
-    }
   });
+
+  // Procesar las condiciones para generar queryParams
+  for (const [field, conditions] of Object.entries(fieldOccurrences)) {
+      if (conditions.length > 1) {
+          // Unir condiciones duplicadas con OR
+          currentGroup.push(conditions.join("|"));
+      } else {
+          currentGroup.push(conditions[0]);
+      }
+  }
 
   // Añadir el último grupo si existe
   if (currentGroup.length > 0) {
-    queryParams.push(currentGroup.join("&"));
+      queryParams.push(currentGroup.join("&"));
   }
 
   // Construir la URL con AND y OR correctamente
   let finalUrl = baseUrl;
   let isFirstGroup = true;
   queryParams.forEach((param) => {
-    if (param !== "AND" && param !== "OR") {
-      if (isFirstGroup) {
-        finalUrl += `?${param}`;
-        isFirstGroup = false;
+      if (param !== "AND" && param !== "OR") {
+          if (isFirstGroup) {
+              finalUrl += `?${param}`;
+              isFirstGroup = false;
+          } else {
+              finalUrl += `&${param}`;
+          }
       } else {
-        finalUrl += `&${param}`;
+          // Agregar operadores lógicos sólo si ya hay parámetros en la URL
+          if (finalUrl.includes('?')) {
+              finalUrl += param === "AND" ? "&" : "|";
+          }
       }
-    } else {
-      // Agregar operadores lógicos sólo si ya hay parámetros en la URL
-      if (finalUrl.includes('?')) {
-        finalUrl += param === "AND" ? "&" : "|";
-      }
-    }
   });
 
   // Limpiar casos donde pueda haber |& al inicio
@@ -379,19 +394,20 @@ async function buildQueryUrl(baseUrl, expression) {
 
   // Si no hay parámetros en queryParams, devolver solo el baseUrl
   if (queryParams.length === 0) {
-    finalUrl = baseUrl;
+      finalUrl = baseUrl;
   }
 
-  // Llamar a organizeCustomFields
+  // Llamar a organizeCustomFields (asumiendo que esta función existe y está definida en otra parte)
   const customFieldGroups = organizeCustomFields(expression);
 
   finalUrl = finalUrl.replace('?&', '?').replace('&&', '&').replace('|&', '|');
 
   return {
-    url: finalUrl,
-    customFields: customFieldGroups
+      url: finalUrl,
+      customFields: customFieldGroups
   };
 }
+
 
 
 function organizeCustomFields(expression) {

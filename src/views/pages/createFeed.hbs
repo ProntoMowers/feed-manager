@@ -375,7 +375,7 @@
         };
 
         var fields = ['type', 'price', 'is_featured', 'availability', 'is_visible', 'is_free_shipping', 'id', 'weight', 'condition', 'Add Custom Field'];
-        var selectedFields = new Set();
+        //var selectedFields = new Set();
         var currentExpression = [];
         var fullExpression = [];
         var customFieldsExpressions = [];
@@ -392,13 +392,13 @@
             fields.forEach(function (field, index) {
                 var cell = document.createElement('td');
                 cell.innerText = field;
-                cell.className = (selectedFields.has(field) && field !== 'price' && field !== 'id' && field !== 'weight') ? 'disabled' : '';
+                //cell.className = (selectedFields.has(field) && field !== 'price' && field !== 'id' && field !== 'weight') ? 'disabled' : '';
                 cell.onclick = function () {
                     console.log('Field clicked:', field);
-                    if (!selectedFields.has(field) || field === 'price' || field === 'id' || field === 'weight') {
-                        selectField(field);
+                    selectField(field);
+                    /*if (!selectedFields.has(field) || field === 'price' || field === 'id' || field === 'weight') {
                         //hideAlert();
-                    }
+                    }*/
                 };
                 row.appendChild(cell);
                 if ((index + 1) % 4 === 0) {
@@ -419,9 +419,11 @@
             }
 
             currentExpression = [field];
+            /*
             if (field !== 'price' && field !== 'id' && field !== 'weight') {
                 selectedFields.add(field);
             }
+            */
             loadFields();
             loadOperators(field);
             showTab('operators');

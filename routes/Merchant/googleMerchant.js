@@ -134,7 +134,7 @@ routerMerchant.post("/totalActiveProducts/multiple", async (req, res) => {
           return {
             storeHash,
             totalActiveProducts: null,
-            
+            totalProducts:null,
             message: `No se encontró información para el storeHash: ${storeHash}`
           };
         }
@@ -148,12 +148,14 @@ routerMerchant.post("/totalActiveProducts/multiple", async (req, res) => {
         };
 
         const totalActiveProducts = await listAllActiveProducts(config);
+        const totalProducts = await listAllProducts(config)
 
         console.log("Total Active Products para Store Hash:", storeHash, totalActiveProducts);
 
         return {
           storeHash,
-          totalActiveProducts
+          totalActiveProducts,
+          totalProducts
         };
       } catch (error) {
         console.error(`Error procesando el storeHash: ${storeHash}`, error);
