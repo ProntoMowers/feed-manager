@@ -327,22 +327,16 @@ routerFeeds.get("/feeds/synchronize/:feedId", authenticateToken, async (req, res
             console.log("Access Token: ", accessToken);
 
             const baseUrl = `https://api.bigcommerce.com/stores/${storeHash}/v3/catalog/products`;
-            const urlResult = await buildQueryUrl(baseUrl, formula);
+            const url = await buildQueryUrl(baseUrl, formula);
 
             const config = {
-                accessToken: accessToken,
-                storeHash: storeHash,
-                domain: feed.domain,
-                apiInfo: urlResult
-            };
-            
-            const configBase = {
                 accessToken: accessToken,
                 storeHash: storeHash,
                 client_email: feed.client_email,
                 private_key: privateKey,
                 merchantId: merchantId,
-                domain: feed.domain
+                domain: feed.domain,
+                apiInfo: url
             };
 
             const configCron = {
@@ -351,25 +345,19 @@ routerFeeds.get("/feeds/synchronize/:feedId", authenticateToken, async (req, res
                 isActive: feed.isActive
             }
 
-            console.log("Url Formada: ", JSON.stringify(urlResult.customFields, null, 2));
-            console.log("Url Formada: ", urlResult.url);
+            console.log("Url Formada: ", JSON.stringify(url.customFields, null, 2));
+            console.log("Url Formada: ", url.url);
 
             // Ejecutar las operaciones asíncronas en segundo plano
             setImmediate(async () => {
                 try {
 
-                    for (const url of urlResult.urls) {
-                        const config = {
-                            ...configBase,
-                            apiInfo: { url: [url], customFields:urlResult.customFields }
-                        };
-                        console.log("Config info: ", config);
-    
-                        const conteoPages = await countPagesNew(config);
-                        console.log("Conteo: ", conteoPages);
-                        const conteoByTipo = await manageProductProcessingFeed(config, conteoPages);
-                        console.log("Conteo por tipo: ", conteoByTipo);
-                    }
+                    const conteoPages = await countPagesNew(config);
+                    console.log("Conteo: ", conteoPages);
+                    const conteoByTipo = await manageProductProcessingFeed(config, conteoPages);
+
+
+                    console.log("Conteo: ", conteoPages);
 
                     const WebHooks = await fetchWebHooks(config);
 
