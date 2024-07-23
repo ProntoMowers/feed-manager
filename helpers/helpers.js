@@ -310,28 +310,15 @@ async function buildQueryUrl(baseUrl, expression) {
       "condition",
   ];
   const queryParams = [];
-  let currentGroup = [];
-  let lastLogicOperator = "AND";
+  const fieldOccurrences = {};
 
   const conditions = expression.split(/(AND|OR|\(|\))/).map((cond) => cond.trim()).filter(cond => cond);
 
-  const fieldOccurrences = {};
-
-  conditions.forEach((condition, index) => {
-      if (condition === "(" || condition === ")") {
-          // Ignorar paréntesis
+  conditions.forEach((condition) => {
+      if (condition === "(" || condition === ")" || condition === "AND" || condition === "OR") {
           return;
-      } else if (condition === "AND" || condition === "OR") {
-          lastLogicOperator = condition;
-          if (currentGroup.length > 0) {
-              queryParams.push(currentGroup.join("&"));
-              currentGroup = [];
-          }
-          queryParams.push(condition);
       } else {
-          // Eliminar corchetes y paréntesis
           condition = condition.replace(/[\[\]\(\)]/g, "");
-
           const [field, operator, value] = condition.split(/\s+/);
 
           if (fields.includes(field)) {
@@ -355,55 +342,29 @@ async function buildQueryUrl(baseUrl, expression) {
       }
   });
 
-  // Procesar las condiciones para generar queryParams
-  for (const [field, conditions] of Object.entries(fieldOccurrences)) {
+  // Construir URLs
+  let urls = [baseUrl];
+  Object.entries(fieldOccurrences).forEach(([field, conditions]) => {
       if (conditions.length > 1) {
-          // Unir condiciones duplicadas con OR
-          currentGroup.push(conditions.join("|"));
+          // Si hay múltiples valores para un campo, generar múltiples URLs
+          const newUrls = [];
+          urls.forEach((url) => {
+              conditions.forEach((condition) => {
+                  newUrls.push(`${url.includes('?') ? url + '&' : url + '?'}${condition}`);
+              });
+          });
+          urls = newUrls;
       } else {
-          currentGroup.push(conditions[0]);
-      }
-  }
-
-  // Añadir el último grupo si existe
-  if (currentGroup.length > 0) {
-      queryParams.push(currentGroup.join("&"));
-  }
-
-  // Construir la URL con AND y OR correctamente
-  let finalUrl = baseUrl;
-  let isFirstGroup = true;
-  queryParams.forEach((param) => {
-      if (param !== "AND" && param !== "OR") {
-          if (isFirstGroup) {
-              finalUrl += `?${param}`;
-              isFirstGroup = false;
-          } else {
-              finalUrl += `&${param}`;
-          }
-      } else {
-          // Agregar operadores lógicos sólo si ya hay parámetros en la URL
-          if (finalUrl.includes('?')) {
-              finalUrl += param === "AND" ? "&" : "|";
-          }
+          // Si solo hay un valor, agregarlo a todas las URLs
+          urls = urls.map((url) => `${url.includes('?') ? url + '&' : url + '?'}${conditions[0]}`);
       }
   });
-
-  // Limpiar casos donde pueda haber |& al inicio
-  finalUrl = finalUrl.replace('|&', '|');
-
-  // Si no hay parámetros en queryParams, devolver solo el baseUrl
-  if (queryParams.length === 0) {
-      finalUrl = baseUrl;
-  }
 
   // Llamar a organizeCustomFields (asumiendo que esta función existe y está definida en otra parte)
   const customFieldGroups = organizeCustomFields(expression);
 
-  finalUrl = finalUrl.replace('?&', '?').replace('&&', '&').replace('|&', '|');
-
   return {
-      url: finalUrl,
+      url: urls.map(url => url.replace('?&', '?').replace('&&', '&').replace('|&', '|')),
       customFields: customFieldGroups
   };
 }

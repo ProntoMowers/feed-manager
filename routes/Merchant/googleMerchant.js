@@ -108,11 +108,12 @@ routerMerchant.post("/merchant/:storeHash", async (req, res) => {
     merchantId: feedInfo.client_id
 };
 
+  const totalProducts = await listAllProducts(config)
   const totalActiveProducts = await listAllActiveProducts(config)
   //const totalActiveProducts = await getProductInfoGoogleMerchant(config,"799868-A")
 
   console.log("Total Active Products: ", totalActiveProducts);
-  res.send({totalActiveProducts:totalActiveProducts});
+  res.send({totalActiveProducts:totalActiveProducts,totalProducts:totalProducts});
 });
 
 
