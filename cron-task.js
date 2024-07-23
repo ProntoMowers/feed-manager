@@ -47,15 +47,32 @@ async function synchronizeFeedCron(feedId) {
                 apiInfo: url
             };
 
+            const configBase = {
+                accessToken: accessToken,
+                storeHash: storeHash,
+                client_email: feed.client_email,
+                private_key: privateKey,
+                merchantId: merchantId,
+                domain: feed.domain,
+            };
+
             console.log("Config: ", config);
 
             // Ejecutar las operaciones asíncronas en segundo plano
             setImmediate(async () => {
                 try {
-                    const productsSKUs = await listAllProductIds(config);
-                    const conteoPages = await countPagesNew(config);
-                    console.log("Conteo: ", conteoPages);
-                    const conteoByTipo = await manageProductSync(config, conteoPages,productsSKUs);
+                    for (const urlActual of url.url) {
+                        const config = {
+                            ...configBase,
+                            apiInfo: { url: urlActual, customFields:url.customFields }
+                        };
+                        console.log("Config info: ", config);
+    
+                        const conteoPages = await countPagesNew(config);
+                        console.log("Conteo: ", conteoPages);
+                        const conteoByTipo = await manageProductProcessingFeed(config, conteoPages);
+                        console.log("Conteo por tipo: ", conteoByTipo);
+                    }
                     //const conteoByTipo = await manageProductProcessingFeed(config, conteoPages);
 
 
