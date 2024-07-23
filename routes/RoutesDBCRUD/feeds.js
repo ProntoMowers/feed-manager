@@ -306,7 +306,7 @@ routerFeeds.get("/feeds/synchronize2/:feedId", authenticateToken, async (req, re
     }
 });
 
-routerFeeds.get("/feeds/synchronize/:feedId", authenticateToken, async (req, res) => {
+routerFeeds.get("/feeds/synchronize/:feedId"/*, authenticateToken*/, async (req, res) => {
     const { feedId } = req.params;
     try {
         const feed = await fetchOneFromTable('feeds', feedId, 'feed_id');
@@ -347,6 +347,7 @@ routerFeeds.get("/feeds/synchronize/:feedId", authenticateToken, async (req, res
 
             console.log("Url Formada: ", JSON.stringify(url.customFields, null, 2));
             console.log("Url Formada: ", url.url);
+            config.apiInfo.url = url.url[0];
 
             // Ejecutar las operaciones asíncronas en segundo plano
             setImmediate(async () => {

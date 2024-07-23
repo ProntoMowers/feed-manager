@@ -343,6 +343,8 @@ async function processPagesFeed(config, taskStartPage, taskEndPage) {
     const { storeHash, apiInfo } = config;
     const optionsGET = await getConfig(config);
 
+    //console.log("Base URL: ", apiInfo.url)
+
     let baseUrl = apiInfo.url;
     if (baseUrl.includes("?")) {
         baseUrl += "&";
@@ -429,7 +431,7 @@ async function manageProductProcessingFeed(config, totalPages) {
             validProductIds.map((product) => transformProduct(config, product))
         );
 
-        await insertBatchProducts(config, transformedProductos);
+        //await insertBatchProducts(config, transformedProductos);
 
         currentPage = endPage + 1;
     }
