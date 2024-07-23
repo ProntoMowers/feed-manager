@@ -339,6 +339,15 @@ routerFeeds.get("/feeds/synchronize/:feedId"/*, authenticateToken*/, async (req,
                 apiInfo: url
             };
 
+            const configBase = {
+                accessToken: accessToken,
+                storeHash: storeHash,
+                client_email: feed.client_email,
+                private_key: privateKey,
+                merchantId: merchantId,
+                domain: feed.domain,
+            };
+
             const configCron = {
                 selectedDays: feed.selectedDays,
                 intervalHour: feed.intervalHour,
