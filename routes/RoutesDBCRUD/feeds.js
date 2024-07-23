@@ -347,15 +347,28 @@ routerFeeds.get("/feeds/synchronize/:feedId"/*, authenticateToken*/, async (req,
 
             console.log("Url Formada: ", JSON.stringify(url.customFields, null, 2));
             console.log("Url Formada: ", url.url);
-            config.apiInfo.url = url.url[0];
+            //config.apiInfo.url = url.url[0];
 
             // Ejecutar las operaciones asíncronas en segundo plano
             setImmediate(async () => {
                 try {
 
-                    const conteoPages = await countPagesNew(config);
-                    console.log("Conteo: ", conteoPages);
-                    const conteoByTipo = await manageProductProcessingFeed(config, conteoPages);
+                    for (const urlActual of url.url) {
+                        const config = {
+                            ...configBase,
+                            apiInfo: { url: urlActual, customFields:url.customFields }
+                        };
+                        console.log("Config info: ", config);
+    
+                        const conteoPages = await countPagesNew(config);
+                        console.log("Conteo: ", conteoPages);
+                        const conteoByTipo = await manageProductProcessingFeed(config, conteoPages);
+                        console.log("Conteo por tipo: ", conteoByTipo);
+                    }
+
+                    //const conteoPages = await countPagesNew(config);
+                    //console.log("Conteo: ", conteoPages);
+                    //const conteoByTipo = await manageProductProcessingFeed(config, conteoPages);
 
 
                     console.log("Conteo: ", conteoPages);
