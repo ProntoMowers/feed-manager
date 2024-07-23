@@ -67,10 +67,13 @@ async function synchronizeFeedCron(feedId) {
                             apiInfo: { url: urlActual, customFields:url.customFields }
                         };
                         console.log("Config info: ", config);
-    
+                        
+                        
+                        const productsSKUs = await listAllProductIds(config);
+                        console.log("Listos los ID's");
                         const conteoPages = await countPagesNew(config);
                         console.log("Conteo: ", conteoPages);
-                        const conteoByTipo = await manageProductProcessingFeed(config, conteoPages);
+                        const conteoByTipo = await manageProductSync(config, conteoPages,productsSKUs);
                         console.log("Conteo por tipo: ", conteoByTipo);
                     }
                     //const conteoByTipo = await manageProductProcessingFeed(config, conteoPages);
