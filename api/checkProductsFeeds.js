@@ -512,8 +512,10 @@ async function manageProductSync(config, totalPages, googleMerchantSKUs) {
     const { deleteBatchProducts, insertBatchProducts } = require("../api/googleMerchantAPI");
     const { transformProduct } = require("../helpers/helpers");
 
-    const divisionOfPages = 10;
+    const maxSegmentSize = 15;
+    let divisionOfPages = Math.ceil(totalPages / maxSegmentSize);
     const segmentSize = Math.ceil(totalPages / divisionOfPages);
+
     let currentPage = 1;
     let allBigCommerceSKUs = [];
     let totalValidCount = 0;
