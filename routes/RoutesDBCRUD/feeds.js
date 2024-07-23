@@ -306,7 +306,7 @@ routerFeeds.get("/feeds/synchronize2/:feedId", authenticateToken, async (req, re
     }
 });
 
-routerFeeds.get("/feeds/synchronize/:feedId"/*, authenticateToken*/, async (req, res) => {
+routerFeeds.get("/feeds/synchronize/:feedId", authenticateToken, async (req, res) => {
     const { feedId } = req.params;
     try {
         const feed = await fetchOneFromTable('feeds', feedId, 'feed_id');
@@ -380,7 +380,7 @@ routerFeeds.get("/feeds/synchronize/:feedId"/*, authenticateToken*/, async (req,
                     //const conteoByTipo = await manageProductProcessingFeed(config, conteoPages);
 
 
-                    console.log("Conteo: ", conteoPages);
+                    //console.log("Conteo: ", conteoPages);
 
                     const WebHooks = await fetchWebHooks(config);
 
