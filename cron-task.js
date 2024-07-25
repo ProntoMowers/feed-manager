@@ -73,7 +73,7 @@ async function synchronizeFeedCron(feedId) {
                         console.log("Listos los ID's");
                         const conteoPages = await countPagesNew(config);
                         console.log("Conteo: ", conteoPages);
-                        const conteoByTipo = await manageProductSync(config, conteoPages,productsSKUs);
+                        const conteoByTipo = await manageProductProcessingFeed(config, conteoPages);
                         console.log("Conteo por tipo: ", conteoByTipo);
                     }
                     //const conteoByTipo = await manageProductProcessingFeed(config, conteoPages);
