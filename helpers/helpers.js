@@ -38,6 +38,15 @@ async function transformProduct(config, bcProduct) {
 
   };
 
+  if (bcProduct.categories.length > 0) {
+    //console.log("ID de la categoria: ", bcProduct.categories[0]);
+    console.log("Type of ID de la categoria: ", typeof bcProduct.categories[0]);
+    const Category = await fetchCategoryNameById(
+      config,  bcProduct.categories[0]
+    );
+    googleProductFormat.productTypes = Category;
+  }
+
   if (bcProduct.gtin !== "") {
     googleProductFormat.gtin = bcProduct.gtin
   }
