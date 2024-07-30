@@ -102,9 +102,20 @@ async function buildCategoryTree(config, categoryId) {
   }
 }
 
+async function buildCategoryTrees(config, categoryIds) {
+  const categoryTrees = [];
+  for (let i = 0; i < Math.min(categoryIds.length, 5); i++) {
+      const categoryTree = await buildCategoryTree(config, categoryIds[i]);
+      if (categoryTree) {
+          categoryTrees.push(categoryTree);
+      }
+  }
+  return categoryTrees.join(', '); // Combina los árboles de categorías en una sola cadena separada por comas
+}
+
 module.exports = {
   fetchCategoryNameById,
   getConfigCategories,
   getStoreDomain,
-  buildCategoryTree
+  buildCategoryTrees
 };
