@@ -34,7 +34,7 @@ async function fetchCategoryNameById(config, categoryId) {
   const options = await getConfigCategories(config);
   const url = `https://api.bigcommerce.com/stores/${storeHash}/v3/catalog/categories/${categoryId}`;
 
-  async function fetchWithRetry(url, options, retries = 1) {
+  async function fetchWithRetry(url, options, retries = 5, delay = 10000) {
       try {
           const response = await fetch(url, options);
           if (!response.ok) {
@@ -45,9 +45,10 @@ async function fetchCategoryNameById(config, categoryId) {
       } catch (error) {
           if (retries > 0) {
               console.warn(`Retrying fetch for category ID ${categoryId}, attempts left: ${retries}`);
-              return await fetchWithRetry(url, options, retries - 1);
+              await new Promise(resolve => setTimeout(resolve, delay)); // Espera 10 segundos antes de reintentar
+              return await fetchWithRetry(url, options, retries - 1, delay);
           } else {
-              console.error(`Error fetching category name for ID ${categoryId}:`, error);
+              console.error(`Error fetching category name for ID ${categoryId}:`);
               return null; // Retorna null en caso de error después de reintentar
           }
       }
