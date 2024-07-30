@@ -5,7 +5,7 @@ const cron = require('node-cron');
 
 async function transformProduct(config, bcProduct) {
   const { getProductImages } = require("../api/imagesBigCommerceApi");
-  const { fetchCategoryNameById, getStoreDomain } = require("../api/categoriesBigCommerceApi");
+  const { fetchCategoryNameById, getStoreDomain , buildCategoryTree } = require("../api/categoriesBigCommerceApi");
   const { getBrandNameById } = require("../api/productsBigCommerceApi");
 
   const { primerImagen, ImagenesRestantes } = await getProductImages(config, bcProduct.id);
@@ -41,7 +41,7 @@ async function transformProduct(config, bcProduct) {
   if (bcProduct.categories.length > 0) {
     //console.log("ID de la categoria: ", bcProduct.categories[0]);
     //console.log("Type of ID de la categoria: ", bcProduct.categories[0]);
-    const Category = await fetchCategoryNameById(
+    const Category = await buildCategoryTree(
       config,  bcProduct.categories[0]
     );
     googleProductFormat.productTypes = Category;
