@@ -8,6 +8,7 @@ const { countProductsByAvailability, countTotalProducts } = require("./api/produ
 const { listAllProductIds } = require("./api/googleMerchantAPI")
 const {manageProductProcessingFeed, countPagesFeed, manageProductSync, countPagesNew} =require("./api/checkProductsFeeds")
 const {buildQueryUrl} =require("./helpers/helpers")
+const { checkAndResetCheckpoints } = require("./databases/CRUD")
 // Obtener el feedId de las variables de entorno
 const args = process.argv.slice(2);
 const feedId = args[0];
@@ -56,6 +57,9 @@ async function synchronizeFeedCron(feedId) {
                 domain: feed.domain,
             };
 
+            // Verificar y reiniciar checkpoints si es necesario
+            await checkAndResetCheckpoints(feedId);
+
             console.log("Config: ", config);
 
             // Ejecutar las operaciones asíncronas en segundo plano
@@ -73,7 +77,7 @@ async function synchronizeFeedCron(feedId) {
                         console.log("Listos los ID's");
                         const conteoPages = await countPagesNew(config);
                         console.log("Conteo: ", conteoPages);
-                        const conteoByTipo = await manageProductProcessingFeed(config, conteoPages);
+                        const conteoByTipo = await manageProductProcessingFeed(config, feedId, conteoPages, urlActual);
                         console.log("Conteo por tipo: ", conteoByTipo);
                     }
                     //const conteoByTipo = await manageProductProcessingFeed(config, conteoPages);
