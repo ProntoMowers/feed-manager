@@ -371,7 +371,7 @@ routerFeeds.get("/feeds/synchronize/:feedId", authenticateToken, async (req, res
     
                         const conteoPages = await countPagesNew(config);
                         console.log("Conteo: ", conteoPages);
-                        const conteoByTipo = await manageProductProcessingFeed(config, conteoPages);
+                        const conteoByTipo = await manageProductProcessingFeed(config, feedId, conteoPages);
                         console.log("Conteo por tipo: ", conteoByTipo);
                     }
 
