@@ -271,6 +271,29 @@ async function fetchFeedByStoreHash(store_hash) {
     }
 }
 
+async function saveCheckpoint(feedId, storeHash, currentPage) {
+    const sql = 'REPLACE INTO `feed_checkpoints` (feed_id, store_hash, current_page) VALUES (?, ?, ?)';
+    try {
+        const [result] = await pool.promise().query(sql, [feedId, storeHash, currentPage]);
+        console.log(`Checkpoint guardado con éxito para store_hash ${storeHash}:`, result.affectedRows);
+        return result;
+    } catch (error) {
+        console.error(`Error al guardar checkpoint para store_hash ${storeHash}:`, error);
+        throw error;
+    }
+}
+
+
+async function getCheckpoint(storeHash) {
+    const sql = 'SELECT current_page FROM `feed_checkpoints` WHERE store_hash = ?';
+    try {
+        const [results] = await pool.promise().query(sql, [storeHash]);
+        return results.length > 0 ? results[0].current_page : 1;
+    } catch (error) {
+        console.error(`Error al obtener checkpoint para store_hash ${storeHash}:`, error);
+        throw error;
+    }
+}
 
 
 module.exports = {
@@ -289,5 +312,7 @@ module.exports = {
     fetchAllFromTableByUserId,
     updateUserCompany,
     fetchAllFromTableUserRolByUserId,
-    fetchFeedByStoreHash
+    fetchFeedByStoreHash,
+    getCheckpoint,
+    saveCheckpoint
 };

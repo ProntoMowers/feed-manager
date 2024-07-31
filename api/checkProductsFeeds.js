@@ -398,30 +398,26 @@ async function processPagesFeed(config, taskStartPage, taskEndPage) {
 
 
 
-async function manageProductProcessingFeed(config, totalPages) {
+async function manageProductProcessingFeed(config, feedId, totalPages) {
     const { transformProduct } = require("../helpers/helpers");
     const { insertBatchProducts } = require("../api/googleMerchantAPI");
-
-    //const divisionOfPages = 10;
+    const { getCheckpoint, saveCheckpoint } = require("../databases/CRUD");
+    const { storeHash } = config;
 
     const maxSegmentSize = 15;
     let divisionOfPages = Math.ceil(totalPages / maxSegmentSize);
 
-
-
-    const segmentSize = Math.ceil(totalPages / divisionOfPages); // Divide las páginas en 10 partes
-    let currentPage = 1;
-    let totalValidCount = 0; // Contador total para todos los productos válidos
+    const segmentSize = Math.ceil(totalPages / divisionOfPages);
+    let currentPage = await getCheckpoint(storeHash); // Obtener el último checkpoint
+    let totalValidCount = 0;
 
     console.time("manageProductProcessing");
 
-    for (let i = 0; i < divisionOfPages; i++) {
+    for (let i = Math.floor((currentPage - 1) / segmentSize); i < divisionOfPages; i++) {
         const endPage =
             currentPage + segmentSize - 1 > totalPages
                 ? totalPages
                 : currentPage + segmentSize - 1;
-
-
 
         const result = await getAvailableProductsFeed(config, currentPage, endPage);
         const validProductIds = result.allValidProductIds;
@@ -434,15 +430,23 @@ async function manageProductProcessingFeed(config, totalPages) {
         await insertBatchProducts(config, transformedProductos);
 
         currentPage = endPage + 1;
+
+        // Guardar el checkpoint después de cada segmento
+        await saveCheckpoint(feedId, storeHash, currentPage);
+        console.log(`Checkpoint creado en ${currentPage}`);
     }
 
-    console.log(
-        `Total valid products in manageProductProcessing: ${totalValidCount}`
-    ); // Muestra el total de productos válidos procesados
+    // Resetear el checkpoint si hemos llegado al final
+    if (currentPage >= totalPages) {
+        await saveCheckpoint(feedId, storeHash, 0);
+        console.log(`Checkpoint reseteado a 0 para store_hash ${storeHash}`);
+    }
 
+    console.log(`Total valid products in manageProductProcessing: ${totalValidCount}`);
     console.timeEnd("manageProductProcessing");
     return totalValidCount;
 }
+
 
 async function countPagesFeed(config) {
     const { storeHash, apiInfo } = config;
