@@ -125,55 +125,44 @@ routerMerchant.post("/totalActiveProducts/multiple", async (req, res) => {
   console.time("Duración total");
 
   try {
-    const results = await Promise.all(storeHashes.map(async (storeHash) => {
-      try {
-        console.log("Procesando Store Hash: ", storeHash);
-        const feedInfo = await fetchFeedByStoreHash(storeHash);
+      const results = await Promise.all(storeHashes.map(async (storeHash) => {
+          try {
+              console.log("Procesando Store Hash: ", storeHash);
+              const feedInfo = await fetchFeedByStoreHash(storeHash);
 
-        if (!feedInfo) {
-          console.error(`No se encontró información para el storeHash: ${storeHash}`);
-          return {
-            storeHash,
-            totalActiveProducts: null,
-            totalProducts:null,
-            message: `No se encontró información para el storeHash: ${storeHash}`
-          };
-        }
+              if (!feedInfo) {
+                  console.error(`No se encontró información para el storeHash: ${storeHash}`);
+                  return {
+                      storeHash,
+                      activeProductsGM: null,
+                      message: `No se encontró información para el storeHash: ${storeHash}`
+                  };
+              }
 
-        //console.log("Feed Info: ", feedInfo);
+              const activeProductsGM = feedInfo.active_products_gm;
 
-        const config = {
-          client_email: feedInfo.client_email,
-          private_key: feedInfo.private_key,
-          merchantId: feedInfo.client_id
-        };
+              console.log("Active Products GM para Store Hash:", storeHash, activeProductsGM);
 
-        const totalActiveProducts = await listAllActiveProducts(config);
-        const totalProducts = await listAllProducts(config)
+              return {
+                  storeHash,
+                  activeProductsGM
+              };
+          } catch (error) {
+              console.error(`Error procesando el storeHash: ${storeHash}`, error);
+              return {
+                  storeHash,
+                  activeProductsGM: null,
+                  message: `Error procesando el storeHash: ${storeHash}`
+              };
+          }
+      }));
 
-        console.log("Total Active Products para Store Hash:", storeHash, totalActiveProducts);
-
-        return {
-          storeHash,
-          totalActiveProducts,
-          totalProducts
-        };
-      } catch (error) {
-        console.error(`Error procesando el storeHash: ${storeHash}`, error);
-        return {
-          storeHash,
-          totalActiveProducts: null,
-          message: `Error procesando el storeHash: ${storeHash}`
-        };
-      }
-    }));
-
-    console.timeEnd("Duración total");
-    res.send({ results });
+      console.timeEnd("Duración total");
+      res.send({ results });
   } catch (error) {
-    console.error("Error procesando los Store Hashes: ", error);
-    console.timeEnd("Duración total");
-    res.status(500).send({ error: error.message });
+      console.error("Error procesando los Store Hashes: ", error);
+      console.timeEnd("Duración total");
+      res.status(500).send({ error: error.message });
   }
 });
 
