@@ -687,5 +687,59 @@ routerFeeds.put("/feeds/toggleCron/:feedId", authenticateToken, async (req, res)
 });
 
 
+routerFeeds.get("/feeds/synchronize/count/:feedId", authenticateToken, async (req, res) => {
+    const { feedId } = req.params;
+    try {
+        const feed = await fetchOneFromTable('feeds', feedId, 'feed_id');
+
+        if (feed) {
+            const storeHash = feed.store_hash;
+            const accessToken = feed.x_auth_token;
+            const privateKey = feed.private_key; // decrypt(JSON.parse(feed.private_key));
+            const merchantId = feed.client_id;
+            
+            const config = {
+                accessToken: accessToken,
+                storeHash: storeHash,
+                client_email: feed.client_email,
+                private_key: privateKey,
+                merchantId: merchantId,
+                domain: feed.domain
+            };
+
+            // Ejecutar las operaciones de conteo en paralelo
+            try {
+                const [totalProductsGM, totalProductsBC, preorderProducts] = await Promise.all([
+                    listAllProducts(config),
+                    countTotalProducts(config),
+                    countProductsByAvailability(config, "preorder")
+                ]);
+
+                const updateData = {
+                    total_products_bc: totalProductsBC,
+                    active_products_gm: totalProductsGM,
+                    preorder_products: preorderProducts,
+                    isActive: true
+                };
+
+                await updateFeed(feedId, updateData);
+
+                // Responder al cliente
+                res.status(200).json({ message: "Sincronización completada y feed actualizado" });
+            } catch (error) {
+                console.error('Error durante la sincronización en segundo plano:', error);
+                res.status(404).json({ message: "Hubo un error en la sincronización, verifique los datos ingresados" });
+            }
+        } else {
+            res.status(404).json({ message: "Feed no encontrado" });
+        }
+    } catch (error) {
+        console.error('Error al obtener el feed:', error);
+        res.status(500).json({ message: "Error interno del servidor al intentar obtener el feed" });
+    }
+});
+
+
+
 module.exports = routerFeeds;
 
