@@ -687,7 +687,7 @@ routerFeeds.put("/feeds/toggleCron/:feedId", authenticateToken, async (req, res)
 });
 
 
-routerFeeds.get("/feeds/synchronize/count/:feedId", authenticateToken, async (req, res) => {
+routerFeeds.get("/feeds/synchronize/count/:feedId", async (req, res) => {
     const { feedId } = req.params;
     try {
         const feed = await fetchOneFromTable('feeds', feedId, 'feed_id');
