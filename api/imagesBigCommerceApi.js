@@ -32,17 +32,19 @@ async function getProductImages(config, productId) {
         }
         const data = await response.json();
 
-        if (data.data && data.data.length > 1) {
-            const [primerImagen, ...ImagenesRestantes] = data.data;
-            return { primerImagen, ImagenesRestantes }; // Retorna el primer elemento y el resto de imágenes
+        if (data.data && data.data.length > 0) {
+            const primerImagen = data.data.find(image => image.is_thumbnail) || null;
+            const ImagenesRestantes = data.data.filter(image => !image.is_thumbnail);
+            return { primerImagen, ImagenesRestantes }; // Retorna el primer elemento con is_thumbnail y el resto de imágenes
         } else {
-            return { primerImagen: data.data[0], ImagenesRestantes: [] }; // Retorna objeto con valores predeterminados si no hay imágenes
+            return { primerImagen: null, ImagenesRestantes: [] }; // Retorna objeto con valores predeterminados si no hay imágenes
         }
     } catch (error) {
         console.error('Error fetching product images:', error);
         return { primerImagen: null, ImagenesRestantes: [] }; // Retorna un objeto con valores predeterminados en caso de error
     }
 }
+
 
 async function getURLImage(productId) {
     const imagesUrl = `https://api.bigcommerce.com/stores/${storeHash}/v3/catalog/products/${productId}/images`;
