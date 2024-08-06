@@ -18,7 +18,7 @@ async function transformProduct(config, bcProduct) {
     offerId: bcProduct.sku,
     title: bcProduct.name,
     description: bcProduct.description, //.replace(/<[^>]*>?/gm, ""), // Eliminar etiquetas HTML
-    imageLink: `<g:image_link>${primerImagen.url_standard}</g:image_link>`,
+    //imageLink: `<g:image_link>${primerImagen.url_standard}</g:image_link>`,
     contentLanguage: "en",
     targetCountry: "us",
     link: `${config.domain}${bcProduct.custom_url.url}`,
@@ -37,6 +37,12 @@ async function transformProduct(config, bcProduct) {
     mpn: bcProduct.mpn,
 
   };
+
+  if (primerImagen) {
+    //console.log("ID de la categoria: ", bcProduct.categories[0]);
+    //console.log("Type of ID de la categoria: ", bcProduct.categories[0]);
+    googleProductFormat.imageLink = `<g:image_link>${primerImagen.url_standard}</g:image_link>`;
+  }
 
   if (bcProduct.categories.length > 0) {
     //console.log("ID de la categoria: ", bcProduct.categories[0]);
