@@ -35,13 +35,13 @@ async function transformProduct(config, bcProduct) {
     // A continuación, se muestran algunos campos adicionales que podrías querer mapear:
     //brand: "Home & Garden",
     mpn: bcProduct.mpn,
+    imageLink : `<g:image_link>${primerImagen.url_standard}</g:image_link>`
 
   };
 
   if (primerImagen) {
     //console.log("ID de la categoria: ", bcProduct.categories[0]);
     //console.log("Type of ID de la categoria: ", bcProduct.categories[0]);
-    googleProductFormat.imageLink = `<g:image_link>${primerImagen.url_standard}</g:image_link>`;
   }
 
   if (bcProduct.categories.length > 0) {
