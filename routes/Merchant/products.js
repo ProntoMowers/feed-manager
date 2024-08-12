@@ -80,8 +80,8 @@ const {
         console.log("Store Hash: ", storeHash);
         console.log("Access Token: ", accessToken);
 
-        const baseUrl = `https://api.bigcommerce.com/stores/${storeHash}/v3/catalog/products`;
-        const url = await buildQueryUrl(baseUrl, formula);
+        //const baseUrl = `https://api.bigcommerce.com/stores/${storeHash}/v3/catalog/products`;
+        //const url = await buildQueryUrl(baseUrl, formula);
 
         const config = {
             accessToken: accessToken,
@@ -89,8 +89,7 @@ const {
             client_email: feed.client_email,
             private_key: privateKey,
             merchantId: merchantId,
-            domain: feed.domain,
-            apiInfo: url,
+            domain: feed.domain
         };
 
         // Llamar a la función para obtener los IDs de productos por SKUs
