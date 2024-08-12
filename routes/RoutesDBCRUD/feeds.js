@@ -944,4 +944,75 @@ routerFeeds.get(
   }
 );
 
+routerFeeds.post(
+    "/feeds/synchronize/products/:feedId",
+    async (req, res) => {
+      const { feedId } = req.params;
+      const productIds = req.body.productIds;
+  
+      if (!Array.isArray(productIds) || productIds.length === 0) {
+        return res.status(400).json({ message: "Se requiere una lista de productIds válida." });
+      }
+  
+      try {
+        const feed = await fetchOneFromTable("feeds", feedId, "feed_id");
+  
+        if (feed) {
+          const storeHash = feed.store_hash;
+          const accessToken = feed.x_auth_token;
+          const privateKey = feed.private_key; // decrypt(JSON.parse(feed.private_key));
+          const merchantId = feed.client_id;
+          const formula = feed.formulas;
+  
+          const baseUrl = `https://api.bigcommerce.com/stores/${storeHash}/v3/catalog/products`;
+          const url = await buildQueryUrl(baseUrl, formula);
+  
+          const config = {
+            accessToken: accessToken,
+            storeHash: storeHash,
+            client_email: feed.client_email,
+            private_key: privateKey,
+            merchantId: merchantId,
+            domain: feed.domain,
+            apiInfo: url
+          };
+  
+          console.log(
+            `Iniciando sincronización para los productos ${productIds.join(", ")} del feed ${feedId}`
+          );
+  
+          // Ejecutar la sincronización de los productos en segundo plano
+          setImmediate(async () => {
+            try {
+              for (const productId of productIds) {
+                try {
+                  await manageSingleProductProcessing(config, productId);
+                  console.log(`Producto ${productId} sincronizado exitosamente.`);
+                } catch (error) {
+                  console.error(`Error durante la sincronización del producto ${productId}:`, error);
+                }
+              }
+              res.status(200).json({
+                message: "Todos los productos han sido sincronizados exitosamente con Google Merchant",
+              });
+            } catch (error) {
+              console.error("Error durante la sincronización de los productos:", error);
+              res.status(500).json({
+                message: "Hubo un error durante la sincronización de los productos",
+              });
+            }
+          });
+        } else {
+          res.status(404).json({ message: "Feed no encontrado" });
+        }
+      } catch (error) {
+        console.error("Error al obtener el feed:", error);
+        res.status(500).json({
+          message: "Error interno del servidor al intentar obtener el feed",
+        });
+      }
+    }
+  );
+  
+
 module.exports = routerFeeds;
