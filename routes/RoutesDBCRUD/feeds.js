@@ -896,6 +896,7 @@ routerFeeds.get(
         const accessToken = feed.x_auth_token;
         const privateKey = feed.private_key; // decrypt(JSON.parse(feed.private_key));
         const merchantId = feed.client_id;
+        const formula = feed.formulas;
 
         const baseUrl = `https://api.bigcommerce.com/stores/${storeHash}/v3/catalog/products`;
         const url = await buildQueryUrl(baseUrl, formula);
