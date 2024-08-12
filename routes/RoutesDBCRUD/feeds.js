@@ -884,7 +884,7 @@ routerFeeds.get("/feeds/synchronize/count/:feedId", async (req, res) => {
 
 routerFeeds.get(
   "/feeds/synchronize/product/:feedId/:productId",
-  authenticateToken,
+  
   async (req, res) => {
     const { feedId, productId } = req.params;
 
