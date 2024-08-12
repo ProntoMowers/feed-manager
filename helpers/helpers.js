@@ -39,6 +39,18 @@ async function transformProduct(config, bcProduct) {
 
   };
 
+  if (bcProduct.sale_price && bcProduct.sale_price < bcProduct.price) {
+    googleProductFormat.sale_price = {
+      value: bcProduct.sale_price.toString(),
+      currency: "USD",
+    };
+    // Ajustar el precio a ser el mayor valor
+    googleProductFormat.price = {
+      value: bcProduct.price.toString(),
+      currency: "USD",
+    };
+  }
+
   if (primerImagen) {
     //console.log("ID de la categoria: ", bcProduct.categories[0]);
     //console.log("Type of ID de la categoria: ", bcProduct.categories[0]);
