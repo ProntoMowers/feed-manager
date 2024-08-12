@@ -486,6 +486,63 @@ async function getBrandNameById(config, brandId) {
 }
 
 
+
+async function fetchProductIdsBySKUs(config, skus) {
+  const { storeHash, accessToken } = config;
+  const baseUrl = `https://api.bigcommerce.com/stores/${storeHash}/v3/catalog/products`;
+  let productIds = [];
+
+  const options = {
+    method: "GET",
+    headers: {
+      "X-Auth-Token": accessToken,
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+  };
+
+  console.time(`fetchProductIdsBySKUs`);
+
+  for (const sku of skus) {
+    let hasMorePages = true;
+    let page = 1;
+
+    while (hasMorePages) {
+      let url = `${baseUrl}?sku=${encodeURIComponent(sku)}&page=${page}&limit=250`;
+
+      try {
+        const response = await fetch(url, options);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status 1178 Prod: ${response.status}`);
+        }
+        const responseData = await response.json();
+
+        // Busca el producto específico con el SKU proporcionado
+        const product = responseData.data.find(p => p.sku === sku);
+        if (product) {
+          productIds.push(product.id); // Agrega el ID del producto a la lista
+          break; // Salir del bucle si se encontró el producto
+        }
+
+        if (!responseData.meta || !responseData.meta.pagination || responseData.meta.pagination.current_page >= responseData.meta.pagination.total_pages) {
+          hasMorePages = false;
+        } else {
+          page++;
+        }
+      } catch (error) {
+        console.error(`Error fetching product with SKU ${sku}:`, error);
+        hasMorePages = false; // Detiene el bucle si hay un error
+      }
+    }
+  }
+
+  console.timeEnd(`fetchProductIdsBySKUs`);
+  console.log(`Product IDs found for SKUs:`, productIds);
+  return productIds; // Retorna la lista de IDs de los productos encontrados
+}
+
+
+
 module.exports = {
   fetchProductById,
   checkCustomField,
@@ -500,5 +557,6 @@ module.exports = {
   countProductsByAvailability,
   countTotalProducts,
   verifyBigCommerceCredentials,
-  getBrandNameById
+  getBrandNameById,
+  fetchProductIdsBySKUs
 };
