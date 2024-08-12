@@ -129,7 +129,7 @@ const {startCronJob} = require("./helpers/queue.js")
 const PORT = 8080;
 app.listen(PORT, () => {
   console.log(`Servidor corriendo en http://localhost:${PORT}`);
-  console.log(`Prueba 14`);
+  console.log(`Prueba 15`);
   //startCronJob();
 
     /* Modificaste app, auth y queue */
