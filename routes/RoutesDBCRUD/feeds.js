@@ -524,7 +524,7 @@ routerFeeds.get(
 const {
   manageProductSync,
   findMissingProductsInBigCommerce,
-  manageSingleProductProcessing
+  manageSingleProductProcessing,
 } = require("../../api/checkProductsFeeds");
 const { listAllProductIds } = require("../../api/googleMerchantAPI");
 
@@ -884,7 +884,7 @@ routerFeeds.get("/feeds/synchronize/count/:feedId", async (req, res) => {
 
 routerFeeds.get(
   "/feeds/synchronize/product/:feedId/:productId",
-  
+
   async (req, res) => {
     const { feedId, productId } = req.params;
 
@@ -897,6 +897,9 @@ routerFeeds.get(
         const privateKey = feed.private_key; // decrypt(JSON.parse(feed.private_key));
         const merchantId = feed.client_id;
 
+        const baseUrl = `https://api.bigcommerce.com/stores/${storeHash}/v3/catalog/products`;
+        const url = await buildQueryUrl(baseUrl, formula);
+
         const config = {
           accessToken: accessToken,
           storeHash: storeHash,
@@ -904,6 +907,7 @@ routerFeeds.get(
           private_key: privateKey,
           merchantId: merchantId,
           domain: feed.domain,
+          apiInfo: url
         };
 
         console.log(
