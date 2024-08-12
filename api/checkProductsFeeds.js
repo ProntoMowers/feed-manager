@@ -655,11 +655,87 @@ async function findMissingProductsInBigCommerce(config, totalPages, googleMercha
 }
 
 
+
+async function fetchProductById(config, productId) {
+    const { storeHash, accessToken, apiInfo } = config; // Extrae los valores del objeto config
+    const url = `https://api.bigcommerce.com/stores/${storeHash}/v3/catalog/products/${productId}`;
+  
+    const options = {
+      method: "GET",
+      headers: {
+        "X-Auth-Token": accessToken,
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+    };
+  
+    try {
+      const response = await fetch(url, options);
+      if (!response.ok) {
+        // Si el producto no se encuentra, lanzar un error
+        throw new Error(`HTTP error! status 676 Prod: ${response.status}`);
+      }
+      const productData = await response.json();
+      return productData.data; // Retorna los datos del producto
+    } catch (error) {
+      console.error("Error fetching product by ID:", error);
+      throw error;
+    }
+  }
+
+
+  async function manageSingleProductProcessing(config, productId) {
+    const { transformProduct } = require("../helpers/helpers");
+    const { insertProductToGoogleMerchant } = require("../api/googleMerchantAPI");
+    const { getCheckpoint, saveCheckpoint } = require("../databases/CRUD");
+    const { storeHash } = config;
+  
+    let checkpoint = await getCheckpoint(storeHash, productId);
+    
+    if (checkpoint && checkpoint.isCompleted) {
+      console.log(`Producto ${productId} ya fue procesado. Saltando...`);
+      return;
+    }
+  
+    console.log(`Iniciando procesamiento para el producto ${productId}`);
+  
+    try {
+      // Obtener el producto desde BigCommerce
+      const product = await fetchProductById(config, productId);
+      if (!product) {
+        console.error(`Producto con ID ${productId} no encontrado`);
+        return;
+      }
+  
+      // Validar si el producto es válido para enviar
+      const isValid = await checkCustomFieldFeed(config, product.id);
+      if (!isValid) {
+        console.log(`Producto ${productId} no es válido para enviar.`);
+        return;
+      }
+  
+      // Transformar el producto
+      const transformedProduct = await transformProduct(config, product);
+  
+      // Insertar el producto transformado en Google Merchant
+      await insertProductToGoogleMerchant(config, transformedProduct);
+  
+      console.log(`Producto ${productId} procesado y guardado en Google Merchant`);
+  
+    } catch (error) {
+      console.error(`Error al procesar el producto ${productId}:`, error);
+    }
+  }
+  
+  
+
+
 module.exports = {
     manageProductProcessingFeed,
     countPagesFeed,
     checkCustomFieldFeed,
     countPagesNew,
     manageProductSync,
-    findMissingProductsInBigCommerce
+    findMissingProductsInBigCommerce,
+    manageSingleProductProcessing
 }
