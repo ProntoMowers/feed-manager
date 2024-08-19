@@ -6,7 +6,7 @@ const {
   logMemoryUsage,
   createSimpleCron,
   createCronJob,
-  buildQueryUrl,
+  buildQueryUrl,createHourlyCronJob,
   doesCronJobExist,
   deleteCronJob,
 } = require("../../helpers/helpers");
@@ -855,6 +855,8 @@ routerFeeds.get("/feeds/synchronize/count/:feedId", async (req, res) => {
           isActive: true,
         };
 
+        await createHourlyCronJob();
+
         await updateFeed(feedId, updateData);
 
         // Responder al cliente
@@ -1013,6 +1015,9 @@ routerFeeds.post(
       }
     }
   );
+
+
+
   
 
 module.exports = routerFeeds;
