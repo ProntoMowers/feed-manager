@@ -320,6 +320,9 @@ async function createCronJob(feedId, configCron) {
 }
 
 
+
+
+
 async function buildQueryUrl(baseUrl, expression) {
   if (!expression) {
       throw new Error("La expresión es undefined o null");
@@ -502,6 +505,61 @@ async function deleteCronJob(feedId) {
 }
 
 
+
+async function createHourlyCronJob() {
+  const scriptPath = 'countProducts.js';
+  const cronPattern = '0 * * * *'; // Este patrón cron ejecuta la tarea cada hora en el minuto 0
+
+  return new Promise((resolve, reject) => {
+    pm2.connect((err) => {
+      if (err) {
+        return reject(err);
+      }
+
+      // Primero, verifica si el trabajo cron existe
+      pm2.describe(`cron-task-hourly`, (err, processDescription) => {
+        if (err) {
+          pm2.disconnect();
+          return reject(err);
+        }
+
+        // Si el proceso existe, elimínalo
+        if (processDescription && processDescription.length > 0) {
+          pm2.delete(`cron-task-hourly`, (err) => {
+            if (err && err.message !== 'Process or namespace not found') {
+              pm2.disconnect();
+              return reject(err);
+            }
+
+            // Luego, crea el nuevo trabajo cron
+            startNewCronJob();
+          });
+        } else {
+          // Si el proceso no existe, crea el nuevo trabajo cron directamente
+          startNewCronJob();
+        }
+      });
+
+      function startNewCronJob() {
+        pm2.start({
+          script: scriptPath,
+          name: `Conteo productos Merchant`,
+          cron: cronPattern,
+          autorestart: false
+        }, (err, apps) => {
+          if (err) {
+            pm2.disconnect();
+            return reject(err);
+          }
+          pm2.disconnect();
+          resolve(`Trabajo cron creado/actualizado exitosamente con expresión cron: ${cronPattern}`);
+        });
+      }
+    });
+  });
+}
+
+
 module.exports = {
   transformProduct,
   delay,
@@ -514,5 +572,6 @@ module.exports = {
   createSimpleCron,
   buildQueryUrl,
   doesCronJobExist,
-  deleteCronJob
+  deleteCronJob,
+  createHourlyCronJob
 };
