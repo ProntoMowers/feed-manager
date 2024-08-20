@@ -37,13 +37,13 @@ async function transformProduct(config, bcProduct) {
     mpn: bcProduct.mpn,
     imageLink : `<g:image_link>${primerImagen.url_standard}</g:image_link>`,
 
-    customLabel4 : "<g:custom_label_4>N</g:custom_label_4>"
+    customLabel4 : "N"
   };
 
 
   if (bcProduct.availability === "preorder") {
 
-    googleProductFormat.customLabel4 = "<g:custom_label_4>Y</g:custom_label_4>";
+    googleProductFormat.customLabel4 = "Y";
   }
 
   if (bcProduct.sale_price && bcProduct.sale_price < bcProduct.price) {
