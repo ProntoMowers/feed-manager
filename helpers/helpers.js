@@ -42,6 +42,7 @@ async function transformProduct(config, bcProduct) {
 
 
   if (bcProduct.availability === "preorder") {
+    console.log("Producto con Preorder")
 
     googleProductFormat.customLabel4 = "Y";
   }
