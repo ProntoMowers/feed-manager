@@ -38,7 +38,7 @@ async function getProductImages(config, productId) {
                 if (data.data && data.data.length > 0) {
                     const primerImagen = data.data.find(image => image.is_thumbnail) || null;
                     const ImagenesRestantes = data.data.filter(image => !image.is_thumbnail);
-                    console.log(`Finalmente la encontró después de ${attempts + 1} intento(s)!`);
+                    //console.log(`Finalmente la encontró después de ${attempts + 1} intento(s)!`);
                     return { primerImagen, ImagenesRestantes };
                 } else {
                     return { primerImagen: null, ImagenesRestantes: [] };

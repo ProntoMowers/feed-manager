@@ -430,10 +430,26 @@ async function manageProductProcessingFeed(config, feedId, totalPages, currentUr
         totalValidCount += result.totalValidCount;
 
         const transformedProductos = await Promise.all(
-            validProductIds.map((product) => transformProduct(config, product))
+            validProductIds.map(async (product) => {
+                try {
+                    return await transformProduct(config, product);
+                } catch (error) {
+                    console.error(`Error al transformar el producto: ${product.id}, Error: ${error.message}`);
+                    // Opcionalmente puedes retornar null o un objeto vacío para indicar fallo
+                    return null;
+                }
+            })
         );
 
+        // Filtrar productos que fueron transformados correctamente
+        const filteredProducts = transformedProductos.filter(product => product !== null);
+
+        console.log("Llegamos hasta acá");
+
+        console.log("LLegamos hasta acá")
+        
         await insertBatchProducts(config, transformedProductos);
+        console.log("LLegamos hasta acá tambien")
 
         currentPage = endPage + 1;
         await saveCheckpoint(feedId, storeHash, currentPage, currentUrl, totalValidCount);
