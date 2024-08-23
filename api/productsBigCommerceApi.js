@@ -586,5 +586,6 @@ module.exports = {
   countTotalProducts,
   verifyBigCommerceCredentials,
   getBrandNameById,
-  fetchProductIdsBySKUs
+  fetchProductIdsBySKUs,
+  deleteProduct
 };
