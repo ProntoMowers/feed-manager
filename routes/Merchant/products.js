@@ -6,10 +6,11 @@ const {
     getAvailableProducts,
     checkCustomField,
     getProductCustomFields,
-    getAvailableProducts2,
     countPages,
     manageProductProcessing, fetchProductIdsBySKUs
 } = require("../../api/productsBigCommerceApi");
+
+const { fetchOneFromTable } = require("../../databases/CRUD");
 
 const { transformProduct } = require("../../helpers/helpers")
 
@@ -25,6 +26,29 @@ routerProducts.get("/products/getProductByID", async (req, res) => {
     
     const respuestaCustomFliends = await getProductCustomFields(idProducto);
     console.log("Respuesta CustomFliends: ", respuestaCustomFliends);
+
+})
+
+routerProducts.get("/products/deleteProduct/:id/:feedID", async (req, res) => {
+    const productId = req.params.id;
+    const feedId = req.params.feedID;
+
+    const feed = await fetchOneFromTable("feeds", feedId, "feed_id");
+
+    const storeHash = feed.store_hash;
+    const accessToken = feed.x_auth_token;
+  
+    console.log("Formula: ", formula);
+    console.log("Store Hash: ", storeHash);
+    console.log("Access Token: ", accessToken);
+  
+    const config = {
+      accessToken: accessToken,
+      storeHash: storeHash,
+    };
+
+    res.send("Se ha hecho una consulta a un producto");
+    const product = await deleteProduct(config, productId);
 
 })
 
