@@ -7,7 +7,7 @@ const {
     checkCustomField,
     getProductCustomFields,
     countPages,
-    manageProductProcessing, fetchProductIdsBySKUs
+    manageProductProcessing, fetchProductIdsBySKUs, deleteProduct
 } = require("../../api/productsBigCommerceApi");
 
 const { fetchOneFromTable } = require("../../databases/CRUD");
@@ -37,7 +37,7 @@ routerProducts.get("/products/deleteProduct/:id/:feedID", async (req, res) => {
 
     const storeHash = feed.store_hash;
     const accessToken = feed.x_auth_token;
-    
+
     console.log("Store Hash: ", storeHash);
     console.log("Access Token: ", accessToken);
   
