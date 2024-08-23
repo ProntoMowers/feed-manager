@@ -18,6 +18,34 @@ async function getConfig(config) {
   };
 }
 
+
+async function deleteProduct(config, productId) {
+  const { storeHash, accessToken } = config;
+  const url = `https://api.bigcommerce.com/stores/${storeHash}/v3/catalog/products/${productId}`;
+
+  const options = {
+    method: "DELETE",
+    headers: {
+      "X-Auth-Token": accessToken,
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+  };
+
+  try {
+    const response = await fetch(url, options);
+    if (!response.ok) {
+      throw new Error(`HTTP error! status 1143 Prod: ${response.status} while trying to delete product ID: ${productID}`);
+    }
+
+    console.log(`Product with ID: ${productID} has been successfully deleted.`);
+    return { success: true, message: `Product with ID: ${productID} has been successfully deleted.` };
+  } catch (error) {
+    console.error("Error deleting product:", error);
+    return { success: false, message: error.message };
+  }
+}
+
 async function fetchProductById(config, productId) {
   const { storeHash } = config;
   const optionsGET = await getConfig(config);
