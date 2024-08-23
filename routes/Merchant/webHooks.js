@@ -28,8 +28,6 @@ const {
 const { getConfigCategories } = require("../../api/categoriesBigCommerceApi");
 const { getConfigImages } = require("../../api/imagesBigCommerceApi");
 
-const { fetchOneFromTable } = require("../../databases/CRUD");
-
 routerWebHooks.get("/webhooks/fetchWebHooks/:feedID", async (req, res) => {
   const { feedID } = req.params;
   const feed = await fetchOneFromTable("feeds", feedID, "feed_id");
