@@ -73,10 +73,6 @@ routerProducts.get("/products/countPages", async (req, res) => {
 
 })
 
-const {
-    fetchOneFromTable
-  } = require("../../databases/CRUD");
-
   routerProducts.post("/products/fetchProductIds/:feedId", async (req, res) => {
     const { feedId } = req.params;
     const skus = req.body.skus;
