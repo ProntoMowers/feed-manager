@@ -34,8 +34,7 @@ routerWebHooks.get("/webhooks/fetchWebHooks/:feedID", async (req, res) => {
 
   const storeHash = feed.store_hash;
   const accessToken = feed.x_auth_token;
-
-  console.log("Formula: ", formula);
+  
   console.log("Store Hash: ", storeHash);
   console.log("Access Token: ", accessToken);
 
