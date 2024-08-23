@@ -35,11 +35,11 @@ async function deleteProduct(config, productId) {
   try {
     const response = await fetch(url, options);
     if (!response.ok) {
-      throw new Error(`HTTP error! status 1143 Prod: ${response.status} while trying to delete product ID: ${productID}`);
+      throw new Error(`HTTP error! status 1143 Prod: ${response.status} while trying to delete product ID: ${productId}`);
     }
 
-    console.log(`Product with ID: ${productID} has been successfully deleted.`);
-    return { success: true, message: `Product with ID: ${productID} has been successfully deleted.` };
+    console.log(`Product with ID: ${productId} has been successfully deleted.`);
+    return { success: true, message: `Product with ID: ${productId} has been successfully deleted.` };
   } catch (error) {
     console.error("Error deleting product:", error);
     return { success: false, message: error.message };
