@@ -7,7 +7,7 @@ const {
     checkCustomField,
     getProductCustomFields,
     countPages,
-    manageProductProcessing, fetchProductIdsBySKUs, deleteProduct
+    manageProductProcessing, fetchProductIdsBySKUs, deleteProduct, countPagesForDisabledAndZeroPrice
 } = require("../../api/productsBigCommerceApi");
 
 const { fetchOneFromTable } = require("../../databases/CRUD");
@@ -68,6 +68,27 @@ routerProducts.get("/products/sendProductsToGoogleMechant", async (req, res) => 
 routerProducts.get("/products/countPages", async (req, res) => {
     res.send("Se ha hecho una consulta a un producto");
     const conteoPages= await countPages();   // Productos mayores a 0: 17440
+    console.log("Conteo total de productos con parametros: ", conteoPages);
+
+})
+
+routerProducts.get("/products/DisabledAndZeroPrice/:feedID", async (req, res) => {
+    const { feedID } = req.params;
+
+    const feed = await fetchOneFromTable("feeds", feedID, "feed_id");
+
+    const storeHash = feed.store_hash;
+    const accessToken = feed.x_auth_token;
+
+    console.log("Store Hash: ", storeHash);
+    console.log("Access Token: ", accessToken);
+  
+    const config = {
+      accessToken: accessToken,
+      storeHash: storeHash,
+    };
+    res.send("Se ha hecho una consulta a un producto");
+    const conteoPages= await countPagesForDisabledAndZeroPrice(config);   // Productos mayores a 0: 17440
     console.log("Conteo total de productos con parametros: ", conteoPages);
 
 })

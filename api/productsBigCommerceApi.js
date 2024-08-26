@@ -570,6 +570,58 @@ async function fetchProductIdsBySKUs(config, skus) {
 }
 
 
+async function countPagesForDisabledAndZeroPrice(config) {
+  const { storeHash } = config;
+  const optionsGET = await getConfig(config);
+  const baseUrl = `https://api.bigcommerce.com/stores/${storeHash}/v3/catalog/products`;
+
+  console.time("countPagesForDisabledAndZeroPrice");
+
+  try {
+      // Función auxiliar para contar páginas basado en un filtro específico
+      const countPages = async (filter) => {
+          const initialUrl = `${baseUrl}?${filter}&page=1&limit=250`;
+          const initialResponse = await fetchWithRetry(initialUrl, optionsGET);
+
+          if (!initialResponse || !initialResponse.meta || !initialResponse.meta.pagination) {
+              throw new Error(`Invalid response structure for filter: ${filter}`);
+          }
+
+          const totalPages = initialResponse.meta.pagination.total_pages;
+
+          const promises = [];
+          for (let page = 1; page <= totalPages; page++) {
+              const pageUrl = `${baseUrl}?${filter}&page=${page}&limit=250`;
+              promises.push(fetchWithRetry(pageUrl, optionsGET));
+          }
+
+          await Promise.all(promises);
+          return totalPages;
+      };
+
+      // Contar páginas con productos deshabilitados (availability=disabled)
+      const disabledPagesCount = await countPages('availability=disabled');
+
+      // Contar páginas con productos que tienen precio igual a 0
+      const zeroPricePagesCount = await countPages('price=0');
+
+      console.timeEnd("countPagesForDisabledAndZeroPrice");
+
+      console.log(`Total pages with disabled products: ${disabledPagesCount}`);
+      console.log(`Total pages with zero price products: ${zeroPricePagesCount}`);
+
+      return {
+          disabledPagesCount,
+          zeroPricePagesCount
+      };
+  } catch (error) {
+      console.error("Error counting pages:", error.message);
+      throw error;
+  }
+}
+
+
+
 
 module.exports = {
   fetchProductById,
@@ -587,5 +639,6 @@ module.exports = {
   verifyBigCommerceCredentials,
   getBrandNameById,
   fetchProductIdsBySKUs,
-  deleteProduct
+  deleteProduct,
+  countPagesForDisabledAndZeroPrice
 };
