@@ -130,7 +130,7 @@ const PORT = 8080;
 app.listen(PORT, () => {
   console.log(`Servidor corriendo en http://localhost:${PORT}`);
   
-  console.log(`Prueba 19`);
+  console.log(`Prueba 20`);
   //startCronJob();
 
     /* Modificaste app, auth y queue */
