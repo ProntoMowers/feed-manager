@@ -580,30 +580,36 @@ async function countPagesForDisabledAndZeroPrice(config) {
   try {
       // Función auxiliar para contar páginas basado en un filtro específico
       const countPages = async (filter) => {
-          const initialUrl = `${baseUrl}?${filter}&page=1&limit=250`;
-          const initialResponse = await fetchWithRetry(initialUrl, optionsGET);
+        const initialUrl = `${baseUrl}?${filter}&limit=250`;
+        console.log(`Requesting URL: ${initialUrl}`);
+    
+        const initialResponse = await fetchWithRetry(initialUrl, optionsGET);
+        //console.log("Initial Response:", initialResponse);
+    
+        /*if (!initialResponse || !initialResponse.meta || !initialResponse.meta.pagination) {
+            console.warn(`No pagination data found for filter: ${filter}`);
+            return 0; // Si no hay productos, retornamos 0
+        }
+    */
+        const totalPages = initialResponse.data.meta.pagination.total_pages;
 
-          if (!initialResponse || !initialResponse.meta || !initialResponse.meta.pagination) {
-              throw new Error(`Invalid response structure for filter: ${filter}`);
-          }
-
-          const totalPages = initialResponse.meta.pagination.total_pages;
-
-          const promises = [];
-          for (let page = 1; page <= totalPages; page++) {
-              const pageUrl = `${baseUrl}?${filter}&page=${page}&limit=250`;
-              promises.push(fetchWithRetry(pageUrl, optionsGET));
-          }
-
-          await Promise.all(promises);
-          return totalPages;
-      };
+        console.log("Total: ", totalPages);
+    
+        const promises = [];
+        for (let page = 1; page <= totalPages; page++) {
+            const pageUrl = `${baseUrl}?${filter}&page=${page}&limit=250`;
+            promises.push(fetchWithRetry(pageUrl, optionsGET));
+        }
+    
+        await Promise.all(promises);
+        return totalPages;
+    };
+    
 
       // Contar páginas con productos deshabilitados (availability=disabled)
       const disabledPagesCount = await countPages('availability=disabled');
-
-      // Contar páginas con productos que tienen precio igual a 0
       const zeroPricePagesCount = await countPages('price=0');
+      const visiblePagesCount = await countPages('is_visible=true');
 
       console.timeEnd("countPagesForDisabledAndZeroPrice");
 
@@ -612,7 +618,8 @@ async function countPagesForDisabledAndZeroPrice(config) {
 
       return {
           disabledPagesCount,
-          zeroPricePagesCount
+          zeroPricePagesCount,
+          visiblePagesCount
       };
   } catch (error) {
       console.error("Error counting pages:", error.message);

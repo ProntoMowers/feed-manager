@@ -131,7 +131,7 @@ async function createWebhook(scope, destination) {
 
 async function createWebhookToUpdateProduct(config, feedID) {
   const { storeHash, accessToken } = config;
-  const urlPage = "https://pronto-proyect-4gzkueldfa-uc.a.run.app";
+  const urlPage = "http://209.38.4.225:8080/";
   const url = `https://api.bigcommerce.com/stores/${storeHash}/v3/hooks`;
   const producer = `stores/${storeHash}`;
 
@@ -189,8 +189,17 @@ async function createWebhookToUpdateProduct(config, feedID) {
 
 
 
-async function deleteWebhook(webhookId) {
+async function deleteWebhook(webhookId,config) {
+  const { storeHash, accessToken } = config;
   const url = `https://api.bigcommerce.com/stores/${storeHash}/v3/hooks/${webhookId}`;
+
+  const optionsDelete = {
+    method: 'DELETE',
+    headers: {
+      'X-Auth-Token': accessToken,
+      'Content-Type': 'application/json'
+    }
+  };
 
 
   try {
@@ -277,7 +286,7 @@ async function createWebhookToDeleteProduct() {
 
 async function createWebhookToCreateProduct(config,feedId) {
   const { storeHash, accessToken } = config;
-  const urlPage = "209.38.4.225:8000";
+  const urlPage = "http://209.38.4.225:8080/";
   const url = `https://api.bigcommerce.com/stores/${storeHash}/v3/hooks`;
   const producer = `stores/${storeHash}`;
 
