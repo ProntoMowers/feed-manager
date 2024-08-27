@@ -26,6 +26,8 @@ let content;
 let merchantId;
 
 async function initializeGoogleAuth(config) {
+
+  //console.log("config: ",config)
   const { client_email, private_key, merchantId } = config;
 
   //console.log("config en Google: ", config)
@@ -117,6 +119,7 @@ async function insertBatchProducts(config, products) {
 
 
 async function deleteBatchProducts(productIds) {
+  const { content, merchantId } = await initializeGoogleAuth(config);
 
   const batchRequest = { entries: [] };
 
@@ -513,34 +516,64 @@ function createExcel(products, returnBuffer = false) {
   }
 }
 
-async function deleteBatchProducts(productIds,config) {
+async function deleteBatchProducts(productIds, config) {
   const { content, merchantId } = await initializeGoogleAuth(config);
+  const batchSize = 10000; // Tamaño del lote para evitar exceder los límites de la API
+  let successfulDeletions = 0;
 
-  const batchRequest = { entries: [] };
+  for (let i = 0; i < productIds.length; i += batchSize) {
+    const batch = productIds.slice(i, i + batchSize);
+    const batchRequest = { entries: [] };
 
-  productIds.forEach((productId, index) => {
-    batchRequest.entries.push({
-      batchId: index + 1,
-      merchantId: merchantId,
-      method: "delete",
-      productId: "online:en:US:"+productId,
+    batch.forEach((productId, index) => {
+      batchRequest.entries.push({
+        batchId: index + 1,
+        merchantId: merchantId,
+        method: "delete",
+        productId: "online:en:US:" + productId,
+      });
     });
-  });
 
-  console.time("DeleteProductBatchTime"); // Inicia el temporizador
+    console.time("DeleteProductBatchTime"); // Inicia el temporizador
 
-  try {
-    const response = await content.products.custombatch({
-      resource: batchRequest,
-    });
-    console.timeEnd("DeleteProductBatchTime"); // Termina el temporizador y muestra el tiempo
-    console.log(response.data); // Ver la respuesta de la API
-  } catch (error) {
-    console.log("Hubo un error");
-    console.timeEnd("DeleteProductBatchTime"); // Asegúrate de detener el temporizador si hay un error
-    console.error(error);
+    try {
+      const response = await content.products.custombatch({
+        resource: batchRequest,
+      });
+      console.timeEnd("DeleteProductBatchTime"); // Termina el temporizador y muestra el tiempo
+
+      if (response.data.entries) {
+        response.data.entries.forEach((entry) => {
+          if (!entry.errors) {
+            successfulDeletions++;
+          } else {
+           // console.error(`Error in batchId ${entry.batchId}:`);
+            entry.errors.errors.forEach((error) => {
+             // console.error(`  - ${error.message}`);
+              if (error.reason) {
+             //   console.error(`    Reason: ${error.reason}`);
+              }
+              if (error.location) {
+               // console.error(`    Location: ${error.location}`);
+              }
+            });
+          }
+        });
+      } else {
+       // console.log("No entries found in the response.");
+      }
+    } catch (error) {
+      console.log("Hubo un error general en la solicitud.");
+      console.timeEnd("DeleteProductBatchTime"); // Asegúrate de detener el temporizador si hay un error
+      console.error("Error details:", error);
+    }
   }
+
+  console.log(`Total products successfully deleted: ${successfulDeletions}`);
+  return successfulDeletions; // Devuelve el número de eliminaciones exitosas
 }
+
+
 
 async function listAllProductIds(config) {
   const { content, merchantId } = await initializeGoogleAuth(config);

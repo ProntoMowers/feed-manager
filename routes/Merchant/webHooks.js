@@ -6,6 +6,7 @@ const {
   createWebhookToUpdateProduct,
   deleteWebhook,
   activateAllWebHooks,
+  createWebhookToCreateProduct
 } = require("../../api/webHooksBigCommerceApi");
 const {
   findProductByBigCommerceId,
@@ -34,7 +35,7 @@ routerWebHooks.get("/webhooks/fetchWebHooks/:feedID", async (req, res) => {
 
   const storeHash = feed.store_hash;
   const accessToken = feed.x_auth_token;
-  
+
   console.log("Store Hash: ", storeHash);
   console.log("Access Token: ", accessToken);
 
@@ -46,6 +47,64 @@ routerWebHooks.get("/webhooks/fetchWebHooks/:feedID", async (req, res) => {
   res.send("Se ha hecho una consulta de las ordenes");
   const totalWebHooks = await fetchWebHooks(config);
   console.log("WebHooks: ", totalWebHooks);
+});
+
+routerWebHooks.get("/webhooks/createWebHooks/:feedID", async (req, res) => {
+  const { feedID } = req.params;
+  const feed = await fetchOneFromTable("feeds", feedID, "feed_id");
+
+  const storeHash = feed.store_hash;
+  const accessToken = feed.x_auth_token;
+
+  console.log("Store Hash: ", storeHash);
+  console.log("Access Token: ", accessToken);
+
+  const config = {
+    accessToken: accessToken,
+    storeHash: storeHash,
+  };
+
+  res.send("Se ha hecho una consulta de las ordenes");
+  await createWebhookToCreateProduct(config, feedID);
+  await createWebhookToUpdateProduct(config, feedID);
+  console.log("WebHooks: ", totalWebHooks);
+});
+
+routerWebHooks.get("/webhooks/deleteWebhook/:feedID", async (req, res) => {
+  const { WebHookID } = req.params;
+  const { feedID } = req.params;
+
+  const feed = await fetchOneFromTable("feeds", feedID, "feed_id");
+
+  const storeHash = feed.store_hash;
+  const accessToken = feed.x_auth_token;
+
+  console.log("Store Hash: ", storeHash);
+  console.log("Access Token: ", accessToken);
+
+  const config = {
+    accessToken: accessToken,
+    storeHash: storeHash,
+  };
+
+  try {
+    const totalWebHooks = await fetchWebHooks(config);
+
+    // Verifica si se obtuvieron WebHooks
+    if (totalWebHooks.data && totalWebHooks.data.length > 0) {
+      // Itera sobre cada WebHook y elimina según el ID
+      for (const webhook of totalWebHooks.data) {
+        console.log(`Deleting WebHook with ID: ${webhook.id}`);
+        await deleteWebhook(webhook.id, config);
+      }
+      res.send("Se han eliminado todos los WebHooks.");
+    } else {
+      res.send("No se encontraron WebHooks para eliminar.");
+    }
+  } catch (error) {
+    console.error("Error al eliminar WebHooks:", error);
+    res.status(500).send("Hubo un error al eliminar los WebHooks.");
+  }
 });
 
 routerWebHooks.get("/webhooks/activateAllWebHooks", async (req, res) => {
@@ -257,13 +316,6 @@ routerWebHooks.post("/deletedProduct", async (req, res) => {
   } catch (error) {
     console.error("Error al procesar la eliminación del producto: ", error);
   }
-});
-
-routerWebHooks.get("/webhooks/deleteWebhook", async (req, res) => {
-  res.send("Se ha hecho una consulta de las ordenes");
-  const idWebHook = 28127186;
-  const totalWebHooks = await deleteWebhook(idWebHook);
-  //console.log("WebHooks: ", totalWebHooks);
 });
 
 const { CloudSchedulerClient } = require("@google-cloud/scheduler");
