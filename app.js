@@ -137,15 +137,13 @@ app.use(appRouter);
 const {startCronJob} = require("./helpers/queue.js")
 // Server is listening
 const PORT = 8080;
-
-const server = https.createServer(sslOptions, app).listen(PORT, () => {
-  console.log(`Servidor corriendo en https://localhost:${PORT}`);
-  console.log(`Prueba 22`);
+app.listen(PORT, () => {
+  console.log(`Servidor corriendo en http://localhost:${PORT}`);
+  
+  console.log(`Prueba 21`);
   //startCronJob();
-});
 
-server.on('error', (err) => {
-  console.error('Error al iniciar el servidor HTTPS:', err);
+    /* Modificaste app, auth y queue */
 });
 
 
