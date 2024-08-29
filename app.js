@@ -40,11 +40,12 @@ handlebars.registerHelper('includes', function(array, value) {
 
 
 // Configurar opciones SSL
+/*
 const sslOptions = {
   key: fs.readFileSync(__dirname + '/server.key'),
   cert: fs.readFileSync(__dirname + '/server.cert')
 };
-
+*/
 
 // Setting up Handlebars
 app.set('views', path.join(__dirname,"src","views"));
