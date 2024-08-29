@@ -40,12 +40,12 @@ handlebars.registerHelper('includes', function(array, value) {
 
 
 // Configurar opciones SSL
-/*
+
 const sslOptions = {
   key: fs.readFileSync(__dirname + '/server.key'),
   cert: fs.readFileSync(__dirname + '/server.cert')
 };
-*/
+
 
 // Setting up Handlebars
 app.set('views', path.join(__dirname,"src","views"));
@@ -138,6 +138,7 @@ app.use(appRouter);
 const {startCronJob} = require("./helpers/queue.js")
 // Server is listening
 const PORT = 8080;
+/*
 app.listen(PORT, () => {
   console.log(`Servidor corriendo en http://localhost:${PORT}`);
   
@@ -145,6 +146,12 @@ app.listen(PORT, () => {
   //startCronJob();
 
     /* Modificaste app, auth y queue */
+//});
+
+https.createServer(sslOptions, app).listen(PORT, () => {
+  console.log(`Servidor corriendo en https://localhost:${PORT}`);
+  console.log(`Prueba 21`);
+  //startCronJob();
 });
 
 
