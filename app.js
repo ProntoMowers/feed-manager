@@ -138,10 +138,14 @@ const {startCronJob} = require("./helpers/queue.js")
 // Server is listening
 const PORT = 8080;
 
-https.createServer(sslOptions, app).listen(PORT, () => {
+const server = https.createServer(sslOptions, app).listen(PORT, () => {
   console.log(`Servidor corriendo en https://localhost:${PORT}`);
   console.log(`Prueba 22`);
   //startCronJob();
+});
+
+server.on('error', (err) => {
+  console.error('Error al iniciar el servidor HTTPS:', err);
 });
 
 
