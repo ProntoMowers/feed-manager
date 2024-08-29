@@ -319,42 +319,7 @@ routerWebHooks.post("/deletedProduct", async (req, res) => {
 });
 
 const { CloudSchedulerClient } = require("@google-cloud/scheduler");
-const client = new CloudSchedulerClient();
-
-routerWebHooks.get("/createCronJob", async (req, res) => {
-  const projectId = "sincere-stack-421919"; // Reemplaza con tu ID de proyecto
-  const locationId = "us-central1"; // Ejemplo: 'us-central1'
-  const url = "https://pronto-proyect-4gzkueldfa-uc.a.run.app/createCronJob";
-  const jobName = `projects/${projectId}/locations/${locationId}/jobs/your-job-id`;
-
-  // Define el trabajo
-  const job = {
-    name: jobName,
-    httpTarget: {
-      uri: url,
-      httpMethod: "GET",
-    },
-    schedule: "* * * * *", // Frecuencia en formato cron (cada minuto en este ejemplo)
-    timeZone: "America/Los_Angeles", // Ajusta según tu zona horaria
-  };
-
-  try {
-    // Crea el trabajo
-    const [response] = await client.createJob({
-      parent: `projects/${projectId}/locations/${locationId}`,
-      job: job,
-    });
-    res.status(200).send(`Trabajo creado: ${response.name}`);
-  } catch (error) {
-    console.error(error);
-    res.status(500).send("Error al crear el trabajo de cron");
-  }
-});
-
-routerWebHooks.get("/runCronTask", (req, res) => {
-  console.log("Hola mundo");
-  res.send("Hola mundo, funciona el cron correctamente");
-});
+//const client = new CloudSchedulerClient();
 
 const pm2 = require("pm2");
 
