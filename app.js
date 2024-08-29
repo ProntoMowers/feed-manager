@@ -9,6 +9,9 @@ const session = require("express-session")
 const flash = require('express-flash');
 const passport = require('passport');
 
+const https = require('https');  // Importar https
+const fs = require('fs');        // Importar fs
+
 const database = require(path.join(__dirname, 'databases', 'prontoWebDB'));
 const GoogleAPI = require(path.join(__dirname, 'api', 'googleMerchantAPI'));
 
@@ -34,6 +37,13 @@ handlebars.registerHelper('includes', function(array, value) {
   }
   return array.includes(value);
 });
+
+
+// Configurar opciones SSL
+const sslOptions = {
+  key: fs.readFileSync(__dirname + '/server.key'),
+  cert: fs.readFileSync(__dirname + '/server.cert')
+};
 
 
 // Setting up Handlebars
@@ -127,13 +137,11 @@ app.use(appRouter);
 const {startCronJob} = require("./helpers/queue.js")
 // Server is listening
 const PORT = 8080;
-app.listen(PORT, () => {
-  console.log(`Servidor corriendo en http://localhost:${PORT}`);
-  
-  console.log(`Prueba 21`);
-  //startCronJob();
 
-    /* Modificaste app, auth y queue */
+https.createServer(sslOptions, app).listen(PORT, () => {
+  console.log(`Servidor corriendo en https://localhost:${PORT}`);
+  console.log(`Prueba 22`);
+  //startCronJob();
 });
 
 
