@@ -329,6 +329,8 @@ async function generateCronPattern(index, totalProducts) {
     cronPattern = `0 ${startHour} * * 1-5`;
   }
 
+  console.log("CronPattern: ", cronPattern);
+
   return cronPattern;
 }
 
