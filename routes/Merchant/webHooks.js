@@ -237,6 +237,7 @@ routerWebHooks.post("/updatedProduct/:feedID", async (req, res) => {
 routerWebHooks.post("/createdProduct/:feedID", async (req, res) => {
   const { feedID } = req.params;
   const feed = await fetchOneFromTable("feeds", feedID, "feed_id");
+  console.log('Solicitud recibida en /createdProduct');
 
   const storeHash = feed.store_hash;
   const accessToken = feed.x_auth_token;

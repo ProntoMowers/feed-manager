@@ -485,8 +485,6 @@ routerFeeds.get("/feeds/synchronize/:feedId",
               isActive: true,
             };
 
-            await createCronJob(feedId, configCron);
-
             await updateFeed(feedId, updateData);
 
             // Responder inmediatamente al cliente
@@ -717,8 +715,7 @@ routerFeeds.get(
   }
 );
 
-routerFeeds.put(
-  "/feeds/toggleCron/:feedId",
+routerFeeds.put("/feeds/toggleCron/:feedId",
   authenticateToken,
   async (req, res) => {
     const { feedId } = req.params;
@@ -880,8 +877,7 @@ routerFeeds.get("/feeds/synchronize/count/:feedId", async (req, res) => {
   }
 });
 
-routerFeeds.get(
-  "/feeds/synchronize/product/:feedId/:productId",
+routerFeeds.get("/feeds/synchronize/product/:feedId/:productId",
 
   async (req, res) => {
     const { feedId, productId } = req.params;
@@ -942,8 +938,7 @@ routerFeeds.get(
   }
 );
 
-routerFeeds.post(
-    "/feeds/synchronize/products/:feedId",
+routerFeeds.post("/feeds/synchronize/products/:feedId",
     async (req, res) => {
       const { feedId } = req.params;
       const productIds = req.body.productIds;
