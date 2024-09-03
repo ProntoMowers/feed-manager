@@ -137,7 +137,7 @@ app.use(appRouter);
 
 const {startCronJob} = require("./helpers/queue.js")
 // Server is listening
-const PORT = 8080;
+const PORT = 422;
 /*
 app.listen(PORT, () => {
   console.log(`Servidor corriendo en http://localhost:${PORT}`);
