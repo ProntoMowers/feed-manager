@@ -130,10 +130,7 @@ routerWebHooks.get("/webhooks/createWebhookToDeleteProduct",
   }
 );
 
-const {
-  manageProductProcessingFeed,
-  checkCustomFieldFeed,
-} = require("../../api/checkProductsFeeds");
+
 const { buildQueryUrl } = require("../../helpers/helpers");
 
 routerWebHooks.post("/updatedProduct/:feedID", async (req, res) => {
