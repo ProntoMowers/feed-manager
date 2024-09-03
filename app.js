@@ -150,7 +150,7 @@ app.listen(PORT, () => {
 
 https.createServer(sslOptions, app).listen(PORT, () => {
   console.log(`Servidor corriendo en https://localhost:${PORT}`);
-  console.log(`Prueba 21`);
+  console.log(`Prueba 22`);
   //startCronJob();
 });
 

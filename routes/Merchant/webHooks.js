@@ -20,6 +20,7 @@ const {
 const { fetchOneFromTable } = require("../../databases/CRUD");
 
 const { transformProduct } = require("../../helpers/helpers");
+const { checkCustomFieldFeed } = require("../../api/checkProductsFeeds");
 
 const {
   fetchProductById,
@@ -67,7 +68,7 @@ routerWebHooks.get("/webhooks/createWebHooks/:feedID", async (req, res) => {
   res.send("Se ha hecho una consulta de las ordenes");
   await createWebhookToCreateProduct(config, feedID);
   await createWebhookToUpdateProduct(config, feedID);
-  console.log("WebHooks: ", totalWebHooks);
+  //console.log("WebHooks: ", totalWebHooks);
 });
 
 routerWebHooks.get("/webhooks/deleteWebhook/:feedID", async (req, res) => {
@@ -113,8 +114,7 @@ routerWebHooks.get("/webhooks/activateAllWebHooks", async (req, res) => {
   //console.log("WebHooks: ", totalWebHooks);
 });
 
-routerWebHooks.get(
-  "/webhooks/createWebhookToUpdateProduct",
+routerWebHooks.get("/webhooks/createWebhookToUpdateProduct",
   async (req, res) => {
     res.send("Se ha hecho una consulta de las ordenes");
     const idProducto = 87345;
@@ -123,8 +123,7 @@ routerWebHooks.get(
   }
 );
 
-routerWebHooks.get(
-  "/webhooks/createWebhookToDeleteProduct",
+routerWebHooks.get("/webhooks/createWebhookToDeleteProduct",
   async (req, res) => {
     res.send("Se ha hecho una consulta de las ordenes");
     const totalWebHooks = await createWebhookToDeleteProduct();
@@ -256,6 +255,7 @@ routerWebHooks.post("/createdProduct/:feedID", async (req, res) => {
     private_key: privateKey,
     merchantId: merchantId,
     domain: feed.domain,
+    apiInfo: url,
   };
 
   try {
@@ -266,7 +266,7 @@ routerWebHooks.post("/createdProduct/:feedID", async (req, res) => {
     console.log(`El producto creado: ${JSON.stringify(productData, null, 2)}`);
     console.log(`ID del Producto: `, idProduct);
 
-    const hasImage = await checkCustomField(config, idProduct);
+    const hasImage = await checkCustomFieldFeed(config, idProduct);
 
     if (hasImage) {
       const product = await fetchProductById(config, idProduct);
@@ -355,5 +355,58 @@ routerWebHooks.get("/pm2Cron", (req, res) => {
     );
   });
 });
+
+/*
+
+const {
+  createWebhookToCreateProduct,
+  createWebhookToUpdateProduct,
+  fetchWebHooks,
+  activateAllWebHooks,
+} = require("../../api/webHooksBigCommerceApi");
+
+routerWebHooks.post("/webhooks/createWebhooks/:feedID", async (req, res) => {
+  const { feedID } = req.params;
+
+  try {
+    // Obtener el feed desde la base de datos
+    const feed = await fetchOneFromTable("feeds", feedID, "feed_id");
+
+    if (!feed) {
+      return res.status(404).json({ message: "Feed no encontrado." });
+    }
+
+    // Crear la configuración a partir de los datos del feed
+    const storeHash = feed.store_hash;
+    const accessToken = feed.x_auth_token;
+    const privateKey = feed.private_key; // decrypt(JSON.parse(feed.private_key));
+    const merchantId = feed.client_id;
+    const formula = feed.formulas;
+    
+    // Aquí puedes construir la URL o hacer otras configuraciones si es necesario
+    const url = await buildQueryUrl(`https://api.bigcommerce.com/stores/${storeHash}/v3/catalog/products`, formula);
+
+    const config = {
+      accessToken: accessToken,
+      storeHash: storeHash,
+      client_email: feed.client_email,
+      private_key: privateKey,
+      merchantId: merchantId,
+      domain: feed.domain,
+      apiInfo: url,
+    };
+
+    // Crear webhooks para crear y actualizar productos
+    await createWebhookToCreateProduct(config, feedID);
+    await createWebhookToUpdateProduct(config, feedID);
+
+    res.status(200).json({ message: "WebHooks para crear y actualizar productos han sido creados exitosamente." });
+
+  } catch (error) {
+    console.error("Error al crear WebHooks:", error);
+    res.status(500).json({ message: "Hubo un error al crear los WebHooks." });
+  }
+});
+*/
 
 module.exports = routerWebHooks;

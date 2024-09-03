@@ -416,12 +416,7 @@ async function processPagesFeed(config, taskStartPage, taskEndPage) {
   return { validProductIds, count };
 }
 
-async function manageProductProcessingFeed(
-  config,
-  feedId,
-  totalPages,
-  currentUrl
-) {
+async function manageProductProcessingFeed(config,feedId,totalPages,currentUrl) {
   const { transformProduct } = require("../helpers/helpers");
   const { insertBatchProducts } = require("../api/googleMerchantAPI");
   const { getCheckpoint, saveCheckpoint } = require("../databases/CRUD");

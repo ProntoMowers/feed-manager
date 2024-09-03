@@ -114,8 +114,7 @@ routerFeeds.post("/feeds/createFeed", authenticateToken, async (req, res) => {
   }
 });
 
-routerFeeds.get(
-  "/feeds/updateFeed/:feedId",
+routerFeeds.get("/feeds/updateFeed/:feedId",
   authenticateToken,
   async (req, res) => {
     const companies = await fetchDataFromTable("companies");
@@ -138,8 +137,7 @@ routerFeeds.get(
   }
 );
 
-routerFeeds.get(
-  "/app/feeds/createFeed",
+routerFeeds.get("/app/feeds/createFeed",
   authenticateToken,
   async (req, res) => {
     //console.log("Funciona?")
@@ -154,8 +152,7 @@ routerFeeds.get(
   }
 );
 
-routerFeeds.put(
-  "/feeds/update/:feedId",
+routerFeeds.put("/feeds/update/:feedId",
   authenticateToken,
   async (req, res) => {
     const { feedId } = req.params;
@@ -383,8 +380,7 @@ routerFeeds.get(
   }
 );
 
-routerFeeds.get(
-  "/feeds/synchronize/:feedId",
+routerFeeds.get("/feeds/synchronize/:feedId",
   authenticateToken,
   async (req, res) => {
     const { feedId } = req.params;
