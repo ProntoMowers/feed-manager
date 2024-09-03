@@ -262,16 +262,9 @@ const createSimpleCron = async () => {
 
 const pm2 = require('pm2');
 // Usar fetchWithRetry en lugar de fetch directamente
-async function createCronJob(feedId, configCron) {
+async function createCronJob(feedId, index, totalProducts) {
   const scriptPath = 'cron-task.js';
-
-  // Asegúrate de que `configCron` tiene los valores correctos
-  console.log('configCron:', configCron);
-
-  const cronPattern = await generateCronPattern(configCron);
-
-  // Verifica que `cronPattern` es una cadena válida
-  console.log('cronPattern:', cronPattern);
+  const cronPattern = await generateCronPattern(index, totalProducts);
 
   if (!cronPattern || typeof cronPattern !== 'string') {
     return Promise.reject(new Error('generateCronPattern did not return a valid string'));
@@ -283,14 +276,12 @@ async function createCronJob(feedId, configCron) {
         return reject(err);
       }
 
-      // Primero, verifica si el trabajo cron existe
       pm2.describe(`cron-task-${feedId}`, (err, processDescription) => {
         if (err) {
           pm2.disconnect();
           return reject(err);
         }
 
-        // Si el proceso existe, elimínalo
         if (processDescription && processDescription.length > 0) {
           pm2.delete(`cron-task-${feedId}`, (err) => {
             if (err && err.message !== 'Process or namespace not found') {
@@ -298,11 +289,9 @@ async function createCronJob(feedId, configCron) {
               return reject(err);
             }
 
-            // Luego, crea el nuevo trabajo cron
             startNewCronJob();
           });
         } else {
-          // Si el proceso no existe, crea el nuevo trabajo cron directamente
           startNewCronJob();
         }
       });
@@ -327,6 +316,21 @@ async function createCronJob(feedId, configCron) {
   });
 }
 
+async function generateCronPattern(index, totalProducts) {
+  let cronPattern;
+
+  if (totalProducts > 100000) {
+    // Ejecutar sábado y domingo con diferencia de 8 horas
+    const startHour = 1 + ((index - 1) % 3) * 8;
+    cronPattern = `0 ${startHour} * * 6-7`;
+  } else {
+    // Ejecutar de lunes a viernes con diferencia de 1 hora
+    const startHour = 1 + (index - 1) % 24;
+    cronPattern = `0 ${startHour} * * 1-5`;
+  }
+
+  return cronPattern;
+}
 
 
 

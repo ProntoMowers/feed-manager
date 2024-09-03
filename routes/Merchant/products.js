@@ -16,9 +16,9 @@ const {
 } = require("../../api/checkProductsFeeds");
 const { deleteBatchProducts } = require("../../api/googleMerchantAPI");
 
-const { fetchOneFromTable } = require("../../databases/CRUD");
+const { fetchOneFromTable, fetchDataFromTable } = require("../../databases/CRUD");
 
-const { transformProduct } = require("../../helpers/helpers");
+const { transformProduct, createCronJob } = require("../../helpers/helpers");
 
 routerProducts.get("/products/getProductByID", async (req, res) => {
   res.send("Se ha hecho una consulta a un producto");
@@ -158,5 +158,34 @@ routerProducts.post("/products/fetchProductIds/:feedId", async (req, res) => {
     res.status(500).json({ message: "Error al obtener los IDs de productos." });
   }
 });
+
+routerProducts.post('/products/create-cron-jobs', async (req, res) => {
+  try {
+    console.log("Inicio del proceso de creación de cron jobs para todos los feeds");
+
+    const feeds = await fetchDataFromTable("feeds");
+
+    if (feeds.length === 0) {
+      console.error("No se encontraron feeds en la base de datos");
+      return res.status(404).json({ error: "No se encontraron feeds en la base de datos" });
+    }
+
+    // Iterar sobre los feeds utilizando el índice en lugar del `feedId`
+    for (let i = 0; i < feeds.length; i++) {
+      const feed = feeds[i];
+      const totalProductsBC = feed.total_products_bc;
+
+      // Crear el trabajo cron basado en el índice y total de productos
+      await createCronJob(feed.feed_id, i + 1, totalProductsBC);  // Usamos i + 1 para que el índice sea 1-based en lugar de 0-based
+    }
+
+    res.status(200).json({ message: "Todos los cron jobs han sido creados/actualizados exitosamente" });
+
+  } catch (error) {
+    console.error("Error al crear los cron jobs:", error);
+    res.status(500).json({ error: "Error al crear los cron jobs" });
+  }
+});
+
 
 module.exports = routerProducts;
