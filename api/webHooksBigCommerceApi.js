@@ -131,7 +131,7 @@ async function createWebhook(scope, destination) {
 
 async function createWebhookToUpdateProduct(config, feedID) {
   const { storeHash, accessToken } = config;
-  const urlPage = "https://209.38.4.225:422";
+  const urlPage = "https://209.38.4.225:443";
   const url = `https://api.bigcommerce.com/stores/${storeHash}/v3/hooks`;
   const producer = `stores/${storeHash}`;
 
@@ -286,7 +286,7 @@ async function createWebhookToDeleteProduct() {
 
 async function createWebhookToCreateProduct(config,feedId) {
   const { storeHash, accessToken } = config;
-  const urlPage = "https://209.38.4.225:422";
+  const urlPage = "https://209.38.4.225:443";
   const url = `https://api.bigcommerce.com/stores/${storeHash}/v3/hooks`;
   const producer = `stores/${storeHash}`;
 
