@@ -37,7 +37,9 @@ async function transformProduct(config, bcProduct) {
     mpn: bcProduct.mpn,
     imageLink : `<g:image_link>${primerImagen.url_standard}</g:image_link>`,
 
-    customLabel4 : "N"
+    customLabel4 : "N",
+    customLabel1 : ""
+
   };
 
 
@@ -49,17 +51,17 @@ async function transformProduct(config, bcProduct) {
 
   // Implementación de Custom Label 0 para el envío gratuito y con costos específicos
   if (bcProduct.is_free_shipping) {
-    googleProductFormat.customLabel0 = "free-shipping";
+    googleProductFormat.customLabel1 = "free-shipping";
   } else if (bcProduct.fixed_cost_shipping_price > 0) {
     const shippingCost = bcProduct.fixed_cost_shipping_price;
-    googleProductFormat.customLabel0 = 
+    googleProductFormat.customLabel1 = 
       shippingCost < 10 ? "fixed-10" :
       shippingCost < 30 ? "fixed-10-30" :
       shippingCost < 50 ? "fixed-30-50" :
       shippingCost < 100 ? "fixed-50-100" :
       shippingCost < 300 ? "fixed-100-300" : "fixed-300+";
   } else {
-    googleProductFormat.customLabel0 = "order-value-table";
+    googleProductFormat.customLabel1 = "order-value-table";
   }
 
   if (bcProduct.sale_price && bcProduct.sale_price < bcProduct.price) {
