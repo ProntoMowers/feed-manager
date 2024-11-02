@@ -62,7 +62,6 @@ async function transformProduct(config, bcProduct) {
     googleProductFormat.customLabel0 = "order-value-table";
   }
 
-
   if (bcProduct.sale_price && bcProduct.sale_price < bcProduct.price) {
     googleProductFormat.sale_price = {
       value: bcProduct.sale_price.toString(),
