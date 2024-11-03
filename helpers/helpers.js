@@ -38,7 +38,8 @@ async function transformProduct(config, bcProduct) {
     imageLink : `<g:image_link>${primerImagen.url_standard}</g:image_link>`,
 
     customLabel4 : "N",
-    customLabel1 : ""
+    customLabel1 : "",
+    customLabel2 : ""
 
   };
 
@@ -63,6 +64,20 @@ async function transformProduct(config, bcProduct) {
   } else {
     googleProductFormat.customLabel1 = "order-value-table";
   }
+
+  // Determinar el precio efectivo usando sale_price si está definido y es mayor a 0, sino usa price
+  const effectivePrice = (bcProduct.sale_price && bcProduct.sale_price > 0) ? bcProduct.sale_price : bcProduct.price || bcProduct.calculated_price;
+  const costPrice = bcProduct.cost_price;
+
+  // Calcular y asignar el margen en Custom Label 1
+  googleProductFormat.customLabel2 = costPrice > 0 
+    ? ((effectivePrice - costPrice) / costPrice) * 100 < 15 ? "-15" 
+    : ((effectivePrice - costPrice) / costPrice) * 100 < 22 ? "15-22" 
+    : ((effectivePrice - costPrice) / costPrice) * 100 < 30 ? "22-30" 
+    : ((effectivePrice - costPrice) / costPrice) * 100 < 40 ? "30-40" 
+    : ((effectivePrice - costPrice) / costPrice) * 100 <= 50 ? "40-50" 
+    : "50+" 
+    : "N/A";
 
   if (bcProduct.sale_price && bcProduct.sale_price < bcProduct.price) {
     googleProductFormat.sale_price = {
