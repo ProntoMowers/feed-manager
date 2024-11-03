@@ -39,7 +39,8 @@ async function transformProduct(config, bcProduct) {
 
     customLabel4 : "N",
     customLabel1 : "",
-    customLabel2 : ""
+    customLabel2 : "",
+    customLabel3 : ""
 
   };
 
@@ -64,6 +65,18 @@ async function transformProduct(config, bcProduct) {
   } else {
     googleProductFormat.customLabel1 = "order-value-table";
   }
+
+  // Determinar el precio de venta efectivo usando sale_price si está disponible y es mayor a 0; de lo contrario, usa price
+  const productPrice = (bcProduct.sale_price && bcProduct.sale_price > 0) ? bcProduct.sale_price : bcProduct.price || bcProduct.calculated_price;
+
+// Clasificación del precio en Custom Label 2
+  googleProductFormat.customLabel3 = productPrice < 10 ? "10-" 
+    : productPrice < 30 ? "10-30" 
+    : productPrice < 50 ? "30-50" 
+    : productPrice < 100 ? "50-100" 
+    : productPrice < 300 ? "100-300" 
+    : "300+";
+
 
   // Determinar el precio efectivo usando sale_price si está definido y es mayor a 0, sino usa price
   const effectivePrice = (bcProduct.sale_price && bcProduct.sale_price > 0) ? bcProduct.sale_price : bcProduct.price || bcProduct.calculated_price;
