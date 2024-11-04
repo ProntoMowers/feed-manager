@@ -82,14 +82,20 @@ async function createCronJob(feedId, hour, cronPattern) {
         cron: cronPattern,
         autorestart: false,
       }, (err, apps) => {
-        pm2.disconnect();
         if (err) return reject(err);
-        resolve(`Trabajo cron creado para feed ${feedId} a las ${hour} con patrón ${cronPattern}`);
+
+        // Detenemos el cron job inmediatamente después de crearlo para que no se ejecute ahora
+        pm2.stop(`cron-task-${feedId}`, (errStop) => {
+          pm2.disconnect();
+          if (errStop) return reject(errStop);
+          resolve(`Trabajo cron creado y detenido para feed ${feedId} a las ${hour} con patrón ${cronPattern}`);
+        });
       });
     });
   });
 }
 
+// Ejecuta la creación de cron jobs
 createCronJobsForFeeds().then(() => {
   console.log('Proceso de creación de trabajos cron completado.');
 }).catch((err) => {
