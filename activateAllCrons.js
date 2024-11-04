@@ -7,9 +7,10 @@ const startHour = 1; // Empezamos a las 1 AM
 const intervalHours = 1; // Intervalo de 1 hora entre cada feed
 
 // Función para calcular el tiempo de ejecución estimado basado en el número de productos
-function estimateExecutionTime(productsCount, productsPerBatch = 15, timePerBatchSeconds = 148.288) {
-  const totalBatches = Math.ceil(productsCount / productsPerBatch);
-  return totalBatches * timePerBatchSeconds; // Tiempo en segundos
+function estimateExecutionTime(productsCount, productsPerPage = 15, timePer15PagesSeconds = 2 * 60 + 28.288) {
+    const totalPages = Math.ceil(productsCount / productsPerPage);
+    const totalBatches = Math.ceil(totalPages / 15);  // Calcula el número de lotes de 15 páginas
+    return totalBatches * timePer15PagesSeconds;
 }
 
 // Función para generar una expresión cron basada en el día, la hora y el intervalo
@@ -31,7 +32,7 @@ async function createCronJobsForFeeds() {
     let currentHour = startHour;
 
     for (const feed of feeds) {
-        console.log("Leyendo el feed #: ",feed)
+        //console.log("Leyendo el feed #: ",feed)
       const productsCount = feed.total_products_bc;
       const estimatedTimeSeconds = estimateExecutionTime(productsCount);
       const isLargeFeed = estimatedTimeSeconds > 1800; // Más de 30 minutos
@@ -43,11 +44,11 @@ async function createCronJobsForFeeds() {
         // Feeds grandes programados en fines de semana
         cronDay = productsCount > 500000 ? 0 : 6; // Domingo para los feeds enormes, Sábado para los grandes
         currentHour = 1; // Siempre empezamos a la 1 AM en fines de semana para feeds grandes
-        scheduleMessage = `El feed #${feed.id} (${feed.name}) se ejecutará los ${cronDay === 0 ? 'domingos' : 'sábados'} a la(s) ${currentHour}:00 AM`;
+        scheduleMessage = `El feed #${feed.feed_id} (${feed.feed_name}) se ejecutará los ${cronDay === 0 ? 'domingos' : 'sábados'} a la(s) ${currentHour}:00 AM`;
       } else {
         // Feeds pequeños programados de lunes a viernes en intervalos de una hora
         cronDay = '1-5'; // Lunes a viernes
-        scheduleMessage = `El feed #${feed.id} (${feed.name}) se ejecutará de lunes a viernes a la(s) ${currentHour}:00 AM`;
+        scheduleMessage = `El feed #${feed.feed_id} (${feed.feed_name}) se ejecutará de lunes a viernes a la(s) ${currentHour}:00 AM`;
       }
 
       const cronPattern = generateCronPattern(cronDay, currentHour % 24);
