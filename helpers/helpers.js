@@ -26,7 +26,7 @@ async function transformProduct(config, bcProduct) {
     googleProductCategory: 'Home & Garden', // Ejemplo, debería ser específico para tu producto
     condition: bcProduct.condition,
     availability: "in_stock",
-    customLabel0: bcProduct.inventory_level.toString(),
+    customLabel0: "",//bcProduct.inventory_level.toString(),
     price: {
       value: bcProduct.price || bcProduct.calculated_price,
       currency: "USD",
@@ -39,8 +39,7 @@ async function transformProduct(config, bcProduct) {
 
     customLabel4 : "N",
     customLabel1 : "",
-    customLabel2 : "",
-    customLabel3 : ""
+    customLabel2 : ""
 
   };
 
@@ -53,24 +52,24 @@ async function transformProduct(config, bcProduct) {
 
   // Implementación de Custom Label 0 para el envío gratuito y con costos específicos
   if (bcProduct.is_free_shipping) {
-    googleProductFormat.customLabel1 = "free-shipping";
+    googleProductFormat.customLabel0 = "free-shipping";
   } else if (bcProduct.fixed_cost_shipping_price > 0) {
     const shippingCost = bcProduct.fixed_cost_shipping_price;
-    googleProductFormat.customLabel1 = 
+    googleProductFormat.customLabel0 = 
       shippingCost < 10 ? "fixed-10" :
       shippingCost < 30 ? "fixed-10-30" :
       shippingCost < 50 ? "fixed-30-50" :
       shippingCost < 100 ? "fixed-50-100" :
       shippingCost < 300 ? "fixed-100-300" : "fixed-300+";
   } else {
-    googleProductFormat.customLabel1 = "order-value-table";
+    googleProductFormat.customLabel0 = "order-value-table";
   }
 
   // Determinar el precio de venta efectivo usando sale_price si está disponible y es mayor a 0; de lo contrario, usa price
   const productPrice = (bcProduct.sale_price && bcProduct.sale_price > 0) ? bcProduct.sale_price : bcProduct.price || bcProduct.calculated_price;
 
 // Clasificación del precio en Custom Label 2
-  googleProductFormat.customLabel3 = productPrice < 10 ? "10-" 
+  googleProductFormat.customLabel2 = productPrice < 10 ? "10-" 
     : productPrice < 30 ? "10-30" 
     : productPrice < 50 ? "30-50" 
     : productPrice < 100 ? "50-100" 
@@ -83,7 +82,7 @@ async function transformProduct(config, bcProduct) {
   const costPrice = bcProduct.cost_price;
 
   // Calcular y asignar el margen en Custom Label 1
-  googleProductFormat.customLabel2 = costPrice > 0 
+  googleProductFormat.customLabel1 = costPrice > 0 
     ? ((effectivePrice - costPrice) / costPrice) * 100 < 15 ? "-15" 
     : ((effectivePrice - costPrice) / costPrice) * 100 < 22 ? "15-22" 
     : ((effectivePrice - costPrice) / costPrice) * 100 < 30 ? "22-30" 
