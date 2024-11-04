@@ -20,54 +20,48 @@ function generateCronPattern(day, hour) {
 
 // Función principal para crear y programar los cron jobs
 async function createCronJobsForFeeds() {
-  console.log("Inicio del proceso de configuración de cron jobs para los feeds");
-  const currentDateTime = new Date();
-  console.log("Fecha y hora de ejecución:", currentDateTime.toISOString());
-
-  try {
-    // Obtener todos los feeds de la tabla
-    const feeds = await fetchDataFromTable("feeds");
-    //console.log("Feeds obtenidos:", feeds);
-
-    let currentHour = startHour;
-
-    for (const feed of feeds) {
-        //console.log("Leyendo el feed #: ",feed)
-      const productsCount = feed.total_products_bc;
-      const estimatedTimeSeconds = estimateExecutionTime(productsCount);
-      const isLargeFeed = estimatedTimeSeconds > 1800; // Más de 30 minutos
-
-      let cronDay;
-      let scheduleMessage; // Variable para almacenar el mensaje de programación
-
-      if (isLargeFeed) {
-        // Feeds grandes programados en fines de semana
-        cronDay = productsCount > 500000 ? 0 : 6; // Domingo para los feeds enormes, Sábado para los grandes
-        currentHour = 1; // Siempre empezamos a la 1 AM en fines de semana para feeds grandes
-        scheduleMessage = `El feed #${feed.feed_id} (${feed.feed_name}) se ejecutará los ${cronDay === 0 ? 'domingos' : 'sábados'} a la(s) ${currentHour}:00 AM`;
-      } else {
-        // Feeds pequeños programados de lunes a viernes en intervalos de una hora
-        cronDay = '1-5'; // Lunes a viernes
-        scheduleMessage = `El feed #${feed.feed_id} (${feed.feed_name}) se ejecutará de lunes a viernes a la(s) ${currentHour}:00 AM`;
+    console.log("Inicio del proceso de configuración de cron jobs para los feeds");
+    const currentDateTime = new Date();
+    console.log("Fecha y hora de ejecución:", currentDateTime.toISOString());
+  
+    try {
+      const feeds = await fetchDataFromTable("feeds");
+  
+      let currentHour = startHour;
+  
+      for (const feed of feeds) {
+        const productsCount = feed.total_products_bc;
+        const estimatedTimeSeconds = estimateExecutionTime(productsCount);
+        const isLargeFeed = estimatedTimeSeconds > 1800;
+  
+        let cronDay;
+        let scheduleMessage;
+  
+        if (isLargeFeed) {
+          cronDay = productsCount > 500000 ? 0 : 6;
+          scheduleMessage = `El feed #${feed.feed_id} (${feed.feed_name}) se ejecutará los ${cronDay === 0 ? 'domingos' : 'sábados'} a la(s) ${currentHour}:00 AM`;
+        } else {
+          cronDay = '1-5';
+          scheduleMessage = `El feed #${feed.feed_id} (${feed.feed_name}) se ejecutará de lunes a viernes a la(s) ${currentHour}:00 AM`;
+        }
+  
+        const cronPattern = generateCronPattern(cronDay, currentHour % 24);
+        console.log(scheduleMessage);
+  
+        await createCronJob(feed.feed_id, currentHour, cronPattern);
+        
+        // Incrementar la hora después de cada feed
+        currentHour = (currentHour + intervalHours) % 24;
+        if (currentHour === 0) currentHour = 1;  // Evitar la medianoche como hora de inicio
       }
-
-      const cronPattern = generateCronPattern(cronDay, currentHour % 24);
-      console.log(scheduleMessage); // Imprime el mensaje de programación
-
-      await createCronJob(feed.id, currentHour, cronPattern);
-      
-      // Incrementar la hora para el próximo feed si es entre semana
-      if (!isLargeFeed) {
-        currentHour += intervalHours;
-      }
+  
+      console.log("Todos los trabajos cron se han configurado correctamente.");
+  
+    } catch (error) {
+      console.error("Error durante el proceso de configuración de cron jobs:", error);
     }
-
-    console.log("Todos los trabajos cron se han configurado correctamente.");
-
-  } catch (error) {
-    console.error("Error durante el proceso de configuración de cron jobs:", error);
   }
-}
+  
 
 // Función para crear el trabajo cron usando pm2
 async function createCronJob(feedId, hour, cronPattern) {
