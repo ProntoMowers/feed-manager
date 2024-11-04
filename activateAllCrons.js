@@ -26,11 +26,12 @@ async function createCronJobsForFeeds() {
   try {
     // Obtener todos los feeds de la tabla
     const feeds = await fetchDataFromTable("feeds");
-    console.log("Feeds obtenidos:", feeds);
+    //console.log("Feeds obtenidos:", feeds);
 
     let currentHour = startHour;
 
     for (const feed of feeds) {
+        console.log("Leyendo el feed #: ",feed)
       const productsCount = feed.total_products_bc;
       const estimatedTimeSeconds = estimateExecutionTime(productsCount);
       const isLargeFeed = estimatedTimeSeconds > 1800; // Más de 30 minutos
