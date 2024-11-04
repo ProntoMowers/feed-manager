@@ -3,7 +3,7 @@ const axios = require("axios");
 require("dotenv").config();
 
 const { fetchWithRetry } = require("../helpers/helpers");
-const { getConfig } = require("../api/productsBigCommerceApi");
+//const { getConfig } = require("../api/productsBigCommerceApi");
 
 function createOAuthConnection(config) {
   const { accessToken, storeHash } = config;
