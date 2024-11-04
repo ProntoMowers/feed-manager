@@ -915,6 +915,30 @@ async function manageSingleProductProcessing(config, productId) {
   }
 }
 
+async function getCustomFieldProject(config, productId) {
+  const { apiInfo, storeHash } = config;
+  const customFieldGroups = apiInfo.customFields;
+  if (!customFieldGroups || customFieldGroups.length === 0) {
+    return null; // Cambiamos a null para indicar que no se encontró el campo específico
+  }
+
+  const connection = createOAuthConnection(config);
+  const url = `https://api.bigcommerce.com/stores/${storeHash}/v3/catalog/products/${productId}/custom-fields`;
+
+  try {
+    const response = await fetchWithRateLimitInfo(url, connection);
+    const data = response.data;
+
+    // Busca el custom field "__PROJ"
+    const projField = data.find(field => field.name === "__PROJ");
+    return projField ? projField.value : null; // Retorna el valor si existe, o null si no
+  } catch (error) {
+    console.error("Error al consultar los custom fields:", error);
+    return null;
+  }
+}
+
+
 module.exports = {
   manageProductProcessingFeed,
   countPagesFeed,
@@ -924,4 +948,5 @@ module.exports = {
   findMissingProductsInBigCommerce,
   manageSingleProductProcessing,
   countPagesForDisabledAndZeroPrice,
+  getCustomFieldProject
 };

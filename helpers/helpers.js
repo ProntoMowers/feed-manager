@@ -7,6 +7,7 @@ async function transformProduct(config, bcProduct) {
   const { getProductImages } = require("../api/imagesBigCommerceApi");
   const { fetchCategoryNameById, getStoreDomain , buildCategoryTrees } = require("../api/categoriesBigCommerceApi");
   const { getBrandNameById } = require("../api/productsBigCommerceApi");
+  const { getCustomFieldProject } = require("../api/checkProductsFeeds");
 
   const { primerImagen, ImagenesRestantes } = await getProductImages(config, bcProduct.id);
   //const domain = getStoreDomain(config);
@@ -39,7 +40,8 @@ async function transformProduct(config, bcProduct) {
 
     customLabel4 : "N",
     customLabel1 : "",
-    customLabel2 : ""
+    customLabel2 : "",
+    customLabel3 : "",
 
   };
 
@@ -101,6 +103,11 @@ async function transformProduct(config, bcProduct) {
       value: bcProduct.price.toString(),
       currency: "USD",
     };
+  }
+
+  const projectIdentifier = await getCustomFieldProject(config, bcProduct.id);
+  if (projectIdentifier) {
+    googleProductFormat.customLabel3 = projectIdentifier;
   }
 
   if (primerImagen) {
