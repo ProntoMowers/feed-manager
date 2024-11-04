@@ -3,6 +3,7 @@ const axios = require("axios");
 require("dotenv").config();
 
 const { fetchWithRetry } = require("../helpers/helpers");
+const { getConfig } = require("../api/productsBigCommerceApi");
 
 function createOAuthConnection(config) {
   const { accessToken, storeHash } = config;
@@ -922,11 +923,11 @@ async function getCustomFieldProject(config, productId) {
     return null; // Cambiamos a null para indicar que no se encontró el campo específico
   }
 
-  const connection = createOAuthConnection(config);
+  const optionsGET = await getConfig(config);
   const url = `https://api.bigcommerce.com/stores/${storeHash}/v3/catalog/products/${productId}/custom-fields`;
 
   try {
-    const response = await fetchWithRateLimitInfo(url, connection);
+    const response = await fetchWithRetry(url, optionsGET);
     const data = response.data;
 
     // Busca el custom field "__PROJ"
