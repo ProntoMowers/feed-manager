@@ -933,7 +933,7 @@ async function getCustomFieldProject(config, productId) {
     const projField = data.find(field => field.name === "__PROJ");
     return projField ? projField.value : null; // Retorna el valor si existe, o null si no
   } catch (error) {
-    console.error("Error al consultar los custom fields:", error);
+    //console.error("Error al consultar los custom fields:", error);
     return null;
   }
 }
