@@ -108,7 +108,10 @@ async function transformProduct(config, bcProduct) {
   const projectIdentifier = await getCustomFieldProject(config, bcProduct.id);
   if (projectIdentifier) {
     googleProductFormat.customLabel3 = projectIdentifier;
+  } else {
+    delete googleProductFormat.customLabel3; // Elimina customLabel3 si projectIdentifier no existe
   }
+
 
   if (primerImagen) {
     //console.log("ID de la categoria: ", bcProduct.categories[0]);
