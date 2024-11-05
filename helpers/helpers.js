@@ -107,6 +107,7 @@ async function transformProduct(config, bcProduct) {
 
   const projectIdentifier = await getCustomFieldProject(config, bcProduct.id);
   if (projectIdentifier) {
+    console.log("Este producto si tiene el customField: ", bcProduct.id)
     googleProductFormat.customLabel3 = projectIdentifier;
   } else {
     delete googleProductFormat.customLabel3; // Elimina customLabel3 si projectIdentifier no existe
