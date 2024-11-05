@@ -105,7 +105,7 @@ async function transformProduct(config, bcProduct) {
     };
   }
 
-  const projectIdentifier = await getProjectIdentifier(bcProduct.custom_fields); // Cambia esto según la ubicación de los customFields
+  const projectIdentifier = await getProjectIdentifier(config, bcProduct.id); // Cambia esto según la ubicación de los customFields
 
   if (projectIdentifier) {
     console.log("Este producto sí tiene el customField '__PROJ': ", bcProduct.id);
@@ -629,14 +629,50 @@ async function createHourlyCronJob() {
   });
 }
 
-async function getProjectIdentifier(customFields) {
-  if (!customFields) return null;
+// Función para obtener los customFields de un producto
+async function getCustomFields(config, productId) {
+  const { storeHash } = config;
+  const url = `https://api.bigcommerce.com/stores/${storeHash}/v3/catalog/products/${productId}/custom-fields`;
+  
+  const fetchOptions = await getConfig(config); // Obtiene las opciones de configuración de cabeceras
 
+  try {
+      const response = await fetch(url, fetchOptions);
+      if (!response.ok) {
+          console.error(`HTTP error! Status custom fields: ${response.status}`);
+          return []; // Retorna un array vacío en caso de error
+      }
+      const data = await response.json();
+      return data.data; // Retorna un array de customFields
+  } catch (error) {
+      console.error('Error fetching custom fields:', error);
+      return []; // Retorna un array vacío en caso de error
+  }
+}
+
+// Función para obtener el valor del customField "__PROJ"
+async function getProjectIdentifier(config, productId) {
+  const customFields = await getCustomFields(config, productId);
+  
   // Busca un campo cuyo nombre sea "__PROJ"
   const projectField = customFields.find(field => field.name === "__PROJ");
   
   return projectField ? projectField.value : null;
 }
+
+async function getConfig(config) {
+  const { accessToken, storeHash } = config;
+
+  return {
+    method: "GET",
+    headers: {
+      "X-Auth-Token": accessToken,
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+  };
+}
+
 
 
 module.exports = {
