@@ -105,9 +105,10 @@ async function transformProduct(config, bcProduct) {
     };
   }
 
-  const projectIdentifier = await getCustomFieldProject(config, bcProduct.id);
+  const projectIdentifier = await getProjectIdentifier(bcProduct.custom_fields); // Cambia esto según la ubicación de los customFields
+
   if (projectIdentifier) {
-    console.log("Este producto si tiene el customField: ", bcProduct.id)
+    console.log("Este producto sí tiene el customField '__PROJ': ", bcProduct.id);
     googleProductFormat.customLabel3 = projectIdentifier;
   } else {
     delete googleProductFormat.customLabel3; // Elimina customLabel3 si projectIdentifier no existe
@@ -626,6 +627,15 @@ async function createHourlyCronJob() {
       }
     });
   });
+}
+
+async function getProjectIdentifier(customFields) {
+  if (!customFields) return null;
+
+  // Busca un campo cuyo nombre sea "__PROJ"
+  const projectField = customFields.find(field => field.name === "__PROJ");
+  
+  return projectField ? projectField.value : null;
 }
 
 
