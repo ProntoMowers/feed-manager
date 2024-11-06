@@ -42,9 +42,9 @@ handlebars.registerHelper('includes', function(array, value) {
 // Configurar opciones SSL
 
 const sslOptions = {
-  cert: fs.readFileSync(__dirname + '/ea95ba0c768df638.crt'),  // Certificado principal
-  ca: fs.readFileSync(__dirname + '/gd_bundle-g2-g1.crt'),     // Certificado intermedio
-  key: fs.readFileSync(__dirname + '/ea95ba0c768df638.pem')    // Clave privada en formato PEM
+  key: fs.readFileSync(__dirname + '/ea95ba0c768df638.pem'),      // Clave privada en formato PEM
+  cert: fs.readFileSync(__dirname + '/ea95ba0c768df638.crt'),     // Certificado principal
+  ca: fs.readFileSync(__dirname + '/gd_bundle-g2-g1.crt')         // Certificado intermedio
 };
 
 
