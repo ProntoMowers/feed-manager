@@ -42,11 +42,10 @@ handlebars.registerHelper('includes', function(array, value) {
 // Configurar opciones SSL
 
 const sslOptions = {
-  key: fs.readFileSync('/ruta/completa/prontomowers.app.key.pem'),
-  cert: fs.readFileSync('/ruta/completa/ea95ba0c768df638.pem'),
-  ca: fs.readFileSync('/ruta/completa/gd_bundle-g2-g1.crt')
+  key: fs.readFileSync(path.join(__dirname, 'prontomowers.app.key')),  // Clave privada
+  cert: fs.readFileSync(path.join(__dirname, 'ea95ba0c768df638.pem')),  // Certificado público
+  ca: fs.readFileSync(path.join(__dirname, 'gd_bundle-g2-g1.crt'))  // Certificados intermedios
 };
-
 
 
 // Setting up Handlebars
