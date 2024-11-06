@@ -42,8 +42,9 @@ handlebars.registerHelper('includes', function(array, value) {
 // Configurar opciones SSL
 
 const sslOptions = {
-  key: fs.readFileSync(__dirname + '/server.key'),
-  cert: fs.readFileSync(__dirname + '/server.cert')
+  key: fs.readFileSync(path.join(__dirname, 'ea95ba0c768df638')),  // Clave privada
+  cert: fs.readFileSync(path.join(__dirname, 'ea95ba0c768df638.pem')),  // Certificado público
+  ca: fs.readFileSync(path.join(__dirname, 'gd_bundle-g2-g1'))  // Certificados intermedios
 };
 
 
