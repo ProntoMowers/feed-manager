@@ -354,7 +354,7 @@ routerWebHooks.get("/pm2Cron", (req, res) => {
   });
 });
 
-/*
+
 
 const {
   createWebhookToCreateProduct,
@@ -362,7 +362,7 @@ const {
   fetchWebHooks,
   activateAllWebHooks,
 } = require("../../api/webHooksBigCommerceApi");
-
+/*
 routerWebHooks.post("/webhooks/createWebhooks/:feedID", async (req, res) => {
   const { feedID } = req.params;
 
@@ -406,5 +406,6 @@ routerWebHooks.post("/webhooks/createWebhooks/:feedID", async (req, res) => {
   }
 });
 */
+
 
 module.exports = routerWebHooks;
