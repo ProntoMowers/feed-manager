@@ -72,7 +72,7 @@ async function activateAllWebHooks(config) {
 
     // Ejecuta todas las actualizaciones en paralelo
     const results = await Promise.all(updates);
-    console.log("Todos los webhooks han sido actualizados para estar activos", results);
+    //console.log("Todos los webhooks han sido actualizados para estar activos", results);
   } catch (error) {
     console.error("Error en activateAllWebHooks:", error);
   }

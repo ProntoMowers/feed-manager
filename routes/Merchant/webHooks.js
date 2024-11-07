@@ -162,7 +162,7 @@ routerWebHooks.post("/updatedProduct/:feedID", async (req, res) => {
     apiInfo: url,
   };
 
-  await activateAllWebHooks(config);
+  //await activateAllWebHooks(config);
 
   console.clear();
   const productData = req.body;
@@ -264,7 +264,7 @@ routerWebHooks.post("/createdProduct/:feedID", async (req, res) => {
   };
 
   try {
-    await activateAllWebHooks(config);
+    //await activateAllWebHooks(config);
     const productData = req.body;
     const idProduct = productData.data.id;
 
