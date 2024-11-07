@@ -329,7 +329,7 @@ async function findProductByBigCommerceId(bigCommerceId) { // Asegúrate de reem
 async function updateGoogleMerchantProduct(config, googleProductId, bcProduct) {
   const { content, merchantId } = await initializeGoogleAuth(config);
 
-  console.log("Google Product Id: ", googleProductId);
+  //console.log("Google Product Id: ", googleProductId);
 
   const transformedProduct = await transformProduct(bcProduct);
   delete transformedProduct.offerId;
@@ -374,9 +374,9 @@ async function updateGoogleMerchantProduct(config, googleProductId, bcProduct) {
 async function getProductInfoGoogleMerchant(config, productId) {
   const { content, merchantId } = await initializeGoogleAuth(config);
 
-  console.log("SKU recibido desde Info Google Merchant: ", productId);
+  //console.log("SKU recibido desde Info Google Merchant: ", productId);
 
-  console.time("Duración de la obtención del producto"); // Inicia el temporizador
+  //console.time("Duración de la obtención del producto"); // Inicia el temporizador
 
   try {
     const response = await content.products.get({
@@ -384,12 +384,12 @@ async function getProductInfoGoogleMerchant(config, productId) {
       productId: `online:en:US:${productId}`, // Asegúrate de que el ID del producto esté formateado correctamente
     });
 
-    console.log("Información del producto: ", response.data.id);
-    console.timeEnd("Duración de la obtención del producto"); // Detiene el temporizador y muestra la duración
+    //console.log("Información del producto: ", response.data.id);
+    //console.timeEnd("Duración de la obtención del producto"); // Detiene el temporizador y muestra la duración
     return response.data;
   } catch (error) {
-    console.error("Error al obtener la información del producto: ", productId);
-    console.timeEnd("Duración de la obtención del producto"); // Detiene el temporizador si hay un error
+    //console.error("Error al obtener la información del producto: ", productId);
+    //console.timeEnd("Duración de la obtención del producto"); // Detiene el temporizador si hay un error
     throw error;
   }
 }
