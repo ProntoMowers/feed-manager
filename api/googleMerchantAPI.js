@@ -76,7 +76,7 @@ async function insertProductToGoogleMerchant(config, product) {
       merchantId: merchantId,
       resource: product,
     });
-    console.log("Producto insertado");
+    //console.log("Producto insertado");
     return response.data;
   } catch (error) {
     console.error("Error al insertar producto: ", error);
