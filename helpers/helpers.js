@@ -85,11 +85,11 @@ async function transformProduct(config, bcProduct) {
 
   // Calcular y asignar el margen en Custom Label 1
   googleProductFormat.customLabel1 = costPrice > 0 
-    ? ((effectivePrice - costPrice) / costPrice) * 100 < 15 ? "-15" 
-    : ((effectivePrice - costPrice) / costPrice) * 100 < 22 ? "15-22" 
-    : ((effectivePrice - costPrice) / costPrice) * 100 < 30 ? "22-30" 
-    : ((effectivePrice - costPrice) / costPrice) * 100 < 40 ? "30-40" 
-    : ((effectivePrice - costPrice) / costPrice) * 100 <= 50 ? "40-50" 
+    ? ((effectivePrice - costPrice) / effectivePrice) * 100 < 15 ? "-15" 
+    : ((effectivePrice - costPrice) / effectivePrice) * 100 < 22 ? "15-22" 
+    : ((effectivePrice - costPrice) / effectivePrice) * 100 < 30 ? "22-30" 
+    : ((effectivePrice - costPrice) / effectivePrice) * 100 < 40 ? "30-40" 
+    : ((effectivePrice - costPrice) / effectivePrice) * 100 <= 50 ? "40-50" 
     : "50+" 
     : "N/A";
 
