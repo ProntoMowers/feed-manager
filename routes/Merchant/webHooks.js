@@ -137,6 +137,7 @@ routerWebHooks.post("/updatedProduct/:feedID", async (req, res) => {
   const { feedID } = req.params;
   const feed = await fetchOneFromTable("feeds", feedID, "feed_id");
 
+  console.log("-----------Producto Actualizado-----------");
   console.log("Feed: ", feed.feed_name);
   console.log("feedID: ", feedID);
 
@@ -246,6 +247,7 @@ routerWebHooks.post("/createdProduct/:feedID", async (req, res) => {
   const merchantId = feed.client_id;
   const formula = feed.formulas;
 
+  console.log("-----------Producto Creado-----------");
   console.log("Webhook recibido de crear Producto");
 
   const baseUrl = `https://api.bigcommerce.com/stores/${storeHash}/v3/catalog/products`;
