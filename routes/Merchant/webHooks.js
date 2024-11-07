@@ -356,13 +356,13 @@ routerWebHooks.get("/pm2Cron", (req, res) => {
 
 
 
+/*
 const {
   createWebhookToCreateProduct,
   createWebhookToUpdateProduct,
   fetchWebHooks,
   activateAllWebHooks,
 } = require("../../api/webHooksBigCommerceApi");
-/*
 routerWebHooks.post("/webhooks/createWebhooks/:feedID", async (req, res) => {
   const { feedID } = req.params;
 
