@@ -146,6 +146,7 @@ routerWebHooks.post("/updatedProduct/:feedID", async (req, res) => {
   const merchantId = feed.client_id;
   const formula = feed.formulas;
 
+  const baseUrl = `https://api.bigcommerce.com/stores/${storeHash}/v3/catalog/products`;
   const url = await buildQueryUrl(baseUrl, formula);
 
   console.log("Webhook recibido de actualizar productos");
@@ -243,8 +244,12 @@ routerWebHooks.post("/createdProduct/:feedID", async (req, res) => {
   const accessToken = feed.x_auth_token;
   const privateKey = feed.private_key;
   const merchantId = feed.client_id;
+  const formula = feed.formulas;
 
   console.log("Webhook recibido de crear Producto");
+
+  const baseUrl = `https://api.bigcommerce.com/stores/${storeHash}/v3/catalog/products`;
+  const url = await buildQueryUrl(baseUrl, formula);
 
   const config = {
     accessToken: accessToken,
