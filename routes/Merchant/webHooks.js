@@ -137,9 +137,9 @@ routerWebHooks.post("/updatedProduct/:feedID", async (req, res) => {
   const { feedID } = req.params;
   const feed = await fetchOneFromTable("feeds", feedID, "feed_id");
 
-  console.log("-----------Producto Actualizado-----------");
-  console.log("Feed: ", feed.feed_name);
-  console.log("feedID: ", feedID);
+  //console.log("-----------Producto Actualizado-----------");
+  //console.log("Feed: ", feed.feed_name);
+  //console.log("feedID: ", feedID);
 
   const storeHash = feed.store_hash;
   const accessToken = feed.x_auth_token;
@@ -150,7 +150,7 @@ routerWebHooks.post("/updatedProduct/:feedID", async (req, res) => {
   const baseUrl = `https://api.bigcommerce.com/stores/${storeHash}/v3/catalog/products`;
   const url = await buildQueryUrl(baseUrl, formula);
 
-  console.log("Webhook recibido de actualizar productos");
+  //console.log("Webhook recibido de actualizar productos");
 
   const config = {
     accessToken: accessToken,
@@ -168,19 +168,19 @@ routerWebHooks.post("/updatedProduct/:feedID", async (req, res) => {
   const productData = req.body;
   const productId = productData.data.id;
 
-  console.log(`ID del Producto: `, productId);
+  //console.log(`ID del Producto: `, productId);
 
   // Obtener información del producto de BigCommerce.
   const infoProductBigCommerce = await fetchProductById(config, productId);
   if (!infoProductBigCommerce) {
-    console.log("Producto no encontrado en BigCommerce.");
+    //console.log("Producto no encontrado en BigCommerce.");
     return res.status(404).send("Producto no encontrado en BigCommerce.");
   }
 
   const hasImage = await checkCustomFieldFeed(config, productId);
-  console.log("¿El producto tiene imagen correcta?: ", hasImage);
+  //console.log("¿El producto tiene imagen correcta?: ", hasImage);
   if (hasImage) {
-    console.log("El producto tiene imagen adecuada.");
+    //console.log("El producto tiene imagen adecuada.");
   }
 
   try {
@@ -194,28 +194,28 @@ routerWebHooks.post("/updatedProduct/:feedID", async (req, res) => {
       infoProductBigCommerce.availability === "disabled" ||
       !hasImage
     ) {
-      console.log(
-        `El producto ${productId} no está activo o su precio es 0, procediendo a eliminar en Google Merchant.`
-      );
+      //console.log(
+      //  `El producto ${productId} no está activo o su precio es 0, procediendo a eliminar en Google Merchant.`
+      //);
       await deleteGoogleMerchantProduct(config, infoProductGoogle.id);
-      console.log("Producto eliminado en Google Merchant.");
+      //console.log("Producto eliminado en Google Merchant.");
       return res
         .status(200)
         .send(
           "Producto inactivo o a precio cero, no se requiere acción adicional en Google Merchant."
         );
     } else {
-      console.log(`Actualizando el producto ${productId} en Google Merchant.`);
+      //console.log(`Actualizando el producto ${productId} en Google Merchant.`);
       await updateGoogleMerchantProduct(
         config,
         infoProductGoogle.id,
         infoProductBigCommerce
       );
-      console.log("Producto actualizado en Google Merchant.");
+      //console.log("Producto actualizado en Google Merchant.");
       return res.status(200).send("Producto actualizado en Google Merchant.");
     }
   } catch (error) {
-    console.log(`Producto no encontrado en Google Merchant, intentando crear.`);
+    //console.log(`Producto no encontrado en Google Merchant, intentando crear.`);
     if (
       infoProductBigCommerce.price !== 0 &&
       infoProductBigCommerce.is_visible &&
@@ -227,11 +227,11 @@ routerWebHooks.post("/updatedProduct/:feedID", async (req, res) => {
         infoProductBigCommerce
       );
       await insertProductToGoogleMerchant(config, transformedProduct);
-      console.log("Producto creado en Google Merchant.");
+      //console.log("Producto creado en Google Merchant.");
     } else {
-      console.log(
-        "Producto no cumple con las condiciones para ser creado en Google Merchant."
-      );
+      //console.log(
+       // "Producto no cumple con las condiciones para ser creado en Google Merchant."
+      //);
     }
   }
 });
@@ -239,7 +239,7 @@ routerWebHooks.post("/updatedProduct/:feedID", async (req, res) => {
 routerWebHooks.post("/createdProduct/:feedID", async (req, res) => {
   const { feedID } = req.params;
   const feed = await fetchOneFromTable("feeds", feedID, "feed_id");
-  console.log('Solicitud recibida en /createdProduct');
+  //console.log('Solicitud recibida en /createdProduct');
 
   const storeHash = feed.store_hash;
   const accessToken = feed.x_auth_token;
@@ -247,8 +247,8 @@ routerWebHooks.post("/createdProduct/:feedID", async (req, res) => {
   const merchantId = feed.client_id;
   const formula = feed.formulas;
 
-  console.log("-----------Producto Creado-----------");
-  console.log("Webhook recibido de crear Producto");
+  //console.log("-----------Producto Creado-----------");
+  //console.log("Webhook recibido de crear Producto");
 
   const baseUrl = `https://api.bigcommerce.com/stores/${storeHash}/v3/catalog/products`;
   const url = await buildQueryUrl(baseUrl, formula);
@@ -268,8 +268,8 @@ routerWebHooks.post("/createdProduct/:feedID", async (req, res) => {
     const productData = req.body;
     const idProduct = productData.data.id;
 
-    console.log(`El producto creado: ${JSON.stringify(productData, null, 2)}`);
-    console.log(`ID del Producto: `, idProduct);
+    //console.log(`El producto creado: ${JSON.stringify(productData, null, 2)}`);
+    //console.log(`ID del Producto: `, idProduct);
 
     const hasImage = await checkCustomFieldFeed(config, idProduct);
 
@@ -281,7 +281,7 @@ routerWebHooks.post("/createdProduct/:feedID", async (req, res) => {
         transformedProducto
       );
 
-      console.log("Producto insertado en Google Merchant con éxito: ");
+      //console.log("Producto insertado en Google Merchant con éxito: ");
       res
         .status(200)
         .send(
