@@ -10,7 +10,7 @@ async function manageWebhooks(feedID) {
   const feed = await fetchOneFromTable("feeds", feedID, "feed_id");
   const storeHash = feed.store_hash;
   const accessToken = feed.x_auth_token;
-  const storeName = feed.store_name; // Asumiendo que tienes el nombre de la tienda en la base de datos
+  const storeName = feed.feed_name; // Asumiendo que tienes el nombre de la tienda en la base de datos
 
   const config = {
     accessToken: accessToken,
