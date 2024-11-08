@@ -40,7 +40,7 @@ async function synchronizeDisabledAndZeroPriceForAllFeeds() {
                 
                 if (skus.uniqueSKUs.length > 0) {
                     // Eliminar los productos encontrados
-                    //const totalDeleted = await deleteBatchProducts(skus.uniqueSKUs, config);
+                    const totalDeleted = await deleteBatchProducts(skus.uniqueSKUs, config);
                     console.log(`Total de productos eliminados para feed ${feed.feed_id}: ${totalDeleted}`);
 
                     const updateData = {
