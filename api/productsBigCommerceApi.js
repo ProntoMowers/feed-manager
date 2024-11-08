@@ -575,7 +575,7 @@ async function countPagesForDisabledAndZeroPrice(config) {
   const optionsGET = await getConfig(config);
   const baseUrl = `https://api.bigcommerce.com/stores/${storeHash}/v3/catalog/products`;
 
-  console.time("countPagesForDisabledAndZeroPrice");
+  //console.time("countPagesForDisabledAndZeroPrice");
 
   try {
       // Función auxiliar para contar páginas basado en un filtro específico
@@ -584,13 +584,13 @@ async function countPagesForDisabledAndZeroPrice(config) {
         console.log(`Requesting URL: ${initialUrl}`);
     
         const initialResponse = await fetchWithRetry(initialUrl, optionsGET);
-        //console.log("Initial Response:", initialResponse);
+        console.log("Initial Response:", initialResponse);
     
-        /*if (!initialResponse || !initialResponse.meta || !initialResponse.meta.pagination) {
+        if (!initialResponse || !initialResponse.meta || !initialResponse.meta.pagination) {
             console.warn(`No pagination data found for filter: ${filter}`);
             return 0; // Si no hay productos, retornamos 0
         }
-    */
+    
         const totalPages = initialResponse.data.meta.pagination.total_pages;
 
         console.log("Total: ", totalPages);
@@ -611,7 +611,7 @@ async function countPagesForDisabledAndZeroPrice(config) {
       const zeroPricePagesCount = await countPages('price=0');
       const visiblePagesCount = await countPages('is_visible=true');
 
-      console.timeEnd("countPagesForDisabledAndZeroPrice");
+      //console.timeEnd("countPagesForDisabledAndZeroPrice");
 
       console.log(`Total pages with disabled products: ${disabledPagesCount}`);
       console.log(`Total pages with zero price products: ${zeroPricePagesCount}`);
