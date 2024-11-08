@@ -30,13 +30,13 @@ async function synchronizeDisabledAndZeroPriceForAllFeeds() {
                 merchantId: merchantId,
             };
 
-            console.log(`Procesando feed ID: ${feed.feed_id}, Con nombre${feed.feed_name}`);
+            console.log(`Procesando feed ID: ${feed.feed_id}, Con nombre: ${feed.feed_name}`);
 
             try {
                 // Contar productos deshabilitados y con precio igual a 0
                 const skus = await countPagesForDisabledAndZeroPrice(config);
 
-                console.log(`Total de productos deshabilitados y con precio 0 para feed : ${skus}`);
+                console.log(`Total de productos deshabilitados y con precio 0 para feed : ${JSON.stringify(skus)}`);
                 
                 if (skus.uniqueSKUs.length > 0) {
                     // Eliminar los productos encontrados
