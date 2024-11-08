@@ -584,16 +584,19 @@ async function countPagesForDisabledAndZeroPrice(config) {
         console.log(`Requesting URL: ${initialUrl}`);
     
         const initialResponse = await fetchWithRetry(initialUrl, optionsGET);
-        console.log("Initial Response:", initialResponse);
     
-        if (!initialResponse || !initialResponse.meta || !initialResponse.meta.pagination) {
+        // Convertir la respuesta a JSON
+        const initialData = await initialResponse.json();
+        console.log("Initial Data:", initialData);
+    
+        // Validar que la respuesta contenga la estructura esperada
+        if (!initialData || !initialData.meta || !initialData.meta.pagination) {
             console.warn(`No pagination data found for filter: ${filter}`);
-            return 0; // Si no hay productos, retornamos 0
+            return 0; // Si no hay productos o datos de paginación, retornamos 0
         }
     
-        const totalPages = initialResponse.data.meta.pagination.total_pages;
-
-        console.log("Total: ", totalPages);
+        const totalPages = initialData.meta.pagination.total_pages;
+        console.log("Total Pages: ", totalPages);
     
         const promises = [];
         for (let page = 1; page <= totalPages; page++) {
@@ -604,6 +607,7 @@ async function countPagesForDisabledAndZeroPrice(config) {
         await Promise.all(promises);
         return totalPages;
     };
+    
     
 
       // Contar páginas con productos deshabilitados (availability=disabled)
