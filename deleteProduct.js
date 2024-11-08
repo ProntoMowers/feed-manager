@@ -1,5 +1,5 @@
 const { fetchDataFromTable, fetchOneFromTable, updateFeed } = require("./databases/CRUD");
-const { countPagesForDisabledAndZeroPrice, deleteBatchProducts } = require("./api/productsBigCommerceApi");
+const { countPagesForDisabledAndZeroPrice, deleteBatchProducts } = require("./api/checkProductsFeeds");
 
 async function synchronizeDisabledAndZeroPriceForAllFeeds() {
     console.log("Inicio del proceso de eliminación de productos deshabilitados y con precio 0 para todos los feeds");
@@ -36,7 +36,7 @@ async function synchronizeDisabledAndZeroPriceForAllFeeds() {
                 // Contar productos deshabilitados y con precio igual a 0
                 const skus = await countPagesForDisabledAndZeroPrice(config);
 
-                console.log(`Total de productos deshabilitados y con precio 0 para feed : ${JSON.stringify(skus)}`);
+                //console.log(`Total de productos deshabilitados y con precio 0 para feed : ${JSON.stringify(skus)}`);
                 
                 if (skus.uniqueSKUs.length > 0) {
                     // Eliminar los productos encontrados

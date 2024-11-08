@@ -653,7 +653,7 @@ async function countPagesForDisabledAndZeroPrice(config) {
     );
 
     console.log(`Total unique SKUs: ${uniqueSKUs.length}`);
-    console.log("Unique SKUs:", uniqueSKUs);
+    //console.log("Unique SKUs:", uniqueSKUs);
 
     return {
       totalUniqueSKUs: uniqueSKUs.length,

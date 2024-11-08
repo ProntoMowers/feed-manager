@@ -570,7 +570,7 @@ async function fetchProductIdsBySKUs(config, skus) {
 }
 
 
-async function countPagesForDisabledAndZeroPrice(config) {
+async function countPagesForDisabledAndZeroPrice2(config) {
   const { storeHash } = config;
   const optionsGET = await getConfig(config);
   const baseUrl = `https://api.bigcommerce.com/stores/${storeHash}/v3/catalog/products`;
@@ -640,16 +640,16 @@ module.exports = {
   checkCustomField,
   getProductCustomFields,
   getProductsMatchingCustomField,
-  countPages,
   getAvailableProducts,
-  manageProductProcessing,
   getLimitedValidProducts,
-  manageDeleteProductsProcessing,
+  countPages,
   getConfig,
+  getBrandNameById,
+  manageProductProcessing,
+  manageDeleteProductsProcessing,
   countProductsByAvailability,
   countTotalProducts,
   verifyBigCommerceCredentials,
-  getBrandNameById,
   fetchProductIdsBySKUs,
   deleteProduct,
   countPagesForDisabledAndZeroPrice
