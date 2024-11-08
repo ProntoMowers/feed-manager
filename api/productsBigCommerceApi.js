@@ -613,12 +613,13 @@ async function countPagesForDisabledAndZeroPrice(config) {
       // Contar páginas con productos deshabilitados (availability=disabled)
       const disabledPagesCount = await countPages('availability=disabled');
       const zeroPricePagesCount = await countPages('price=0');
-      const visiblePagesCount = await countPages('is_visible=true');
+      const visiblePagesCount = await countPages('is_visible=false');
 
       //console.timeEnd("countPagesForDisabledAndZeroPrice");
 
       console.log(`Total pages with disabled products: ${disabledPagesCount}`);
       console.log(`Total pages with zero price products: ${zeroPricePagesCount}`);
+      console.log(`Total pages with zero price products: ${visiblePagesCount}`);
 
       return {
           disabledPagesCount,

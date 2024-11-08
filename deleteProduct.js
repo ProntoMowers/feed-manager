@@ -35,10 +35,12 @@ async function synchronizeDisabledAndZeroPriceForAllFeeds() {
             try {
                 // Contar productos deshabilitados y con precio igual a 0
                 const skus = await countPagesForDisabledAndZeroPrice(config);
+
+                console.log(`Total de productos deshabilitados y con precio 0 para feed : ${skus}`);
                 
                 if (skus.uniqueSKUs.length > 0) {
                     // Eliminar los productos encontrados
-                    const totalDeleted = await deleteBatchProducts(skus.uniqueSKUs, config);
+                    //const totalDeleted = await deleteBatchProducts(skus.uniqueSKUs, config);
                     console.log(`Total de productos eliminados para feed ${feed.feed_id}: ${totalDeleted}`);
 
                     const updateData = {
