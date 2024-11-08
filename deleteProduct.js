@@ -1,5 +1,6 @@
 const { fetchDataFromTable, fetchOneFromTable, updateFeed } = require("./databases/CRUD");
-const { countPagesForDisabledAndZeroPrice, deleteBatchProducts } = require("./api/checkProductsFeeds");
+const { countPagesForDisabledAndZeroPrice } = require("./api/checkProductsFeeds");
+const { deleteBatchProducts } = require("./api/googleMerchantAPI");
 
 async function synchronizeDisabledAndZeroPriceForAllFeeds() {
     console.log("Inicio del proceso de eliminación de productos deshabilitados y con precio 0 para todos los feeds");
