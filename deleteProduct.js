@@ -30,7 +30,7 @@ async function synchronizeDisabledAndZeroPriceForAllFeeds() {
                 merchantId: merchantId,
             };
 
-            console.log(`Procesando feed ID: ${feed.feed_id}`);
+            console.log(`Procesando feed ID: ${feed.feed_id}, Con nombre${feed.feed_name}`);
 
             try {
                 // Contar productos deshabilitados y con precio igual a 0
