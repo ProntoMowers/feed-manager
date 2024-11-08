@@ -61,7 +61,7 @@ async function createCronJobsForFeeds() {
       const cronPattern = generateCronPattern(cronDay, currentHour);
       console.log(scheduleMessage); // Imprime el mensaje de programación
 
-      await createCronJob(feed.feed_id, currentHour, cronPattern);
+      await createOrUpdateCronJob(feed.feed_id, cronPattern);
     }
 
     console.log("Todos los trabajos cron se han configurado correctamente.");
@@ -70,27 +70,44 @@ async function createCronJobsForFeeds() {
   }
 }
 
-async function createCronJob(feedId, hour, cronPattern) {
+async function createOrUpdateCronJob(feedId, cronPattern) {
   return new Promise((resolve, reject) => {
     pm2.connect((err) => {
       if (err) return reject(err);
 
-      pm2.start({
-        script: 'cron-task.js',
-        name: `cron-task-${feedId}`,
-        args: [feedId],
-        cron: cronPattern,
-        autorestart: false,
-      }, (err, apps) => {
-        if (err) return reject(err);
-
-        // Detenemos el cron job inmediatamente después de crearlo para que no se ejecute ahora
-        pm2.stop(`cron-task-${feedId}`, (errStop) => {
+      pm2.describe(`cron-task-${feedId}`, (err, processDescription) => {
+        if (err) {
           pm2.disconnect();
-          if (errStop) return reject(errStop);
-          resolve(`Trabajo cron creado y detenido para feed ${feedId} a las ${hour} con patrón ${cronPattern}`);
-        });
+          return reject(err);
+        }
+
+        if (processDescription && processDescription.length > 0) {
+          // Si el proceso existe, lo eliminamos primero
+          pm2.delete(`cron-task-${feedId}`, (err) => {
+            if (err && err.message !== 'Process or namespace not found') {
+              pm2.disconnect();
+              return reject(err);
+            }
+            startNewCronJob(); // Llamamos a la función para crear un nuevo cron job
+          });
+        } else {
+          startNewCronJob(); // Creamos el cron job si no existe
+        }
       });
+
+      function startNewCronJob() {
+        pm2.start({
+          script: 'cron-task.js',
+          name: `cron-task-${feedId}`,
+          cron: cronPattern,
+          args: [feedId],
+          autorestart: false
+        }, (err, apps) => {
+          pm2.disconnect();
+          if (err) return reject(err);
+          resolve(`Trabajo cron creado/actualizado exitosamente para feedId: ${feedId} con expresión cron: ${cronPattern}`);
+        });
+      }
     });
   });
 }
