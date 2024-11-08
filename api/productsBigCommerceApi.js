@@ -587,7 +587,7 @@ async function countPagesForDisabledAndZeroPrice(config) {
     
         // Convertir la respuesta a JSON
         const initialData = await initialResponse.json();
-        console.log("Initial Data:", initialData);
+        //console.log("Initial Data:", initialData);
     
         // Validar que la respuesta contenga la estructura esperada
         if (!initialData || !initialData.meta || !initialData.meta.pagination) {
