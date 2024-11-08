@@ -34,7 +34,7 @@ async function synchronizeDisabledAndZeroPriceForAllFeeds() {
 
             try {
                 // Contar productos deshabilitados y con precio igual a 0
-                const skus = await countPagesForDisabledAndZeroPrice(config).json();
+                const skus = await countPagesForDisabledAndZeroPrice(config);
 
                 console.log(`Total de productos deshabilitados y con precio 0 para feed : ${skus}`);
                 
