@@ -38,7 +38,7 @@ async function transformProduct(config, bcProduct) {
     mpn: bcProduct.mpn,
     imageLink : `<g:image_link>${primerImagen.url_standard}</g:image_link>`,
 
-    customLabel4 : "N",
+    customLabel4 : "",
     customLabel1 : "",
     customLabel2 : "",
     customLabel3 : "",
@@ -49,7 +49,15 @@ async function transformProduct(config, bcProduct) {
   if (bcProduct.availability === "preorder") {
     //console.log("Producto con Preorder")
 
-    googleProductFormat.customLabel4 = "Y";
+    googleProductFormat.customLabel4 = "preorder";
+  }else if (bcProduct.availability === "disabled ") {
+    //console.log("Producto con Preorder")
+
+    googleProductFormat.customLabel4 = "disabled ";
+  }else if (bcProduct.availability === "available") {
+    //console.log("Producto con Preorder")
+
+    googleProductFormat.customLabel4 = "available";
   }
 
   // Implementación de Custom Label 0 para el envío gratuito y con costos específicos

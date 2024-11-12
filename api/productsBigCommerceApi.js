@@ -652,5 +652,5 @@ module.exports = {
   verifyBigCommerceCredentials,
   fetchProductIdsBySKUs,
   deleteProduct,
-  countPagesForDisabledAndZeroPrice
+  countPagesForDisabledAndZeroPrice2
 };
