@@ -130,10 +130,68 @@ routerWebHooks.get("/webhooks/createWebhookToDeleteProduct",
   }
 );
 
+routerWebHooks.post("/updatedProduct/:feedID", async (req, res) => {
+  const { feedID } = req.params;
+  const productData = req.body;
+  const productId = productData.data.id;
+
+  // Simulación de la obtención de datos del producto
+  const infoProductBigCommerce = await fetchProductById({ feedID }, productId);
+  
+  if (!infoProductBigCommerce) {
+    return res.status(404).send("Producto no encontrado en BigCommerce.");
+  }
+
+  // Verificación de los requisitos
+  const precioDiferenteDeCero = infoProductBigCommerce.price !== 0;
+  const esVisible = infoProductBigCommerce.is_visible;
+  const disponibilidadNoDeshabilitada = infoProductBigCommerce.availability !== "disabled";
+  const tieneImagen = await checkCustomFieldFeed({ feedID }, productId);
+
+  // Imprimir en consola los resultados de los requisitos
+  console.log("----------- Verificación de Requisitos del Producto Actualizado-----------");
+  console.log(`Precio diferente de cero: ${precioDiferenteDeCero}`);
+  console.log(`Producto es visible: ${esVisible}`);
+  console.log(`Disponibilidad no deshabilitada: ${disponibilidadNoDeshabilitada}`);
+  console.log(`Imagen adecuada: ${tieneImagen}`);
+
+  res.status(200).send("Requisitos del producto verificados en consola.");
+});
+
+routerWebHooks.post("/createdProduct/:feedID", async (req, res) => {
+  const { feedID } = req.params;
+  const productData = req.body;
+  const idProduct = productData.data.id;
+
+  // Simulación de la obtención de datos del producto
+  const product = await fetchProductById({ feedID }, idProduct);
+  
+  if (!product) {
+    return res.status(404).send("Producto no encontrado en BigCommerce.");
+  }
+
+  // Verificación de los requisitos
+  const precioDiferenteDeCero = product.price !== 0;
+  const esVisible = product.is_visible;
+  const disponibilidadNoDeshabilitada = product.availability !== "disabled";
+  const tieneImagen = await checkCustomFieldFeed({ feedID }, idProduct);
+
+  // Imprimir en consola los resultados de los requisitos
+  console.log("----------- Verificación de Requisitos del Producto Creado -----------");
+  console.log(`Precio diferente de cero: ${precioDiferenteDeCero}`);
+  console.log(`Producto es visible: ${esVisible}`);
+  console.log(`Disponibilidad no deshabilitada: ${disponibilidadNoDeshabilitada}`);
+  console.log(`Imagen adecuada: ${tieneImagen}`);
+
+  res.status(200).send("Requisitos del producto creado verificados en consola.");
+});
+
+
+
 
 const { buildQueryUrl } = require("../../helpers/helpers");
 
-routerWebHooks.post("/updatedProduct/:feedID", async (req, res) => {
+routerWebHooks.post("/updatedProduct2/:feedID", async (req, res) => {
   const { feedID } = req.params;
   const feed = await fetchOneFromTable("feeds", feedID, "feed_id");
 
@@ -236,7 +294,7 @@ routerWebHooks.post("/updatedProduct/:feedID", async (req, res) => {
   }
 });
 
-routerWebHooks.post("/createdProduct/:feedID", async (req, res) => {
+routerWebHooks.post("/createdProduct2/:feedID", async (req, res) => {
   const { feedID } = req.params;
   const feed = await fetchOneFromTable("feeds", feedID, "feed_id");
   //console.log('Solicitud recibida en /createdProduct');
