@@ -265,15 +265,19 @@
                             <label for="editUsername" class="form-label">Username</label>
                             <input type="text" class="form-control" id="editUsername" required>
                         </div>
-                        <div class="mb-3">
-                            <label for="Password" class="form-label">Current Password</label>
-                            <div class="input-group">
-                                <input type="password" class="form-control" id="Password">
-                                <span class="input-group-text toggle-password" data-toggle="password">
-                                    <i class="fas fa-eye"></i>
-                                </span>
+
+                        <!--
+                            <div class="mb-3">
+                                <label for="Password" class="form-label">Current Password</label>
+                                <div class="input-group">
+                                    <input type="password" class="form-control" id="Password">
+                                    <span class="input-group-text toggle-password" data-toggle="password">
+                                        <i class="fas fa-eye"></i>
+                                    </span>
+                                </div>
                             </div>
-                        </div>
+                            -->
+
                         <div class="mb-3">
                             <label for="editPassword" class="form-label">New Password</label>
                             <div class="input-group">
@@ -382,7 +386,7 @@
                 event.preventDefault();
                 var userId = document.getElementById('editUserId').value;
                 var username = document.getElementById('editUsername').value;
-                var password = document.getElementById('Password').value;
+                //var password = document.getElementById('Password').value;
                 var newPassword = document.getElementById('editPassword').value;
                 var confirmPassword = document.getElementById('editConfirmPassword').value;
                 //var companyId = document.getElementById('editCompanyId').value;
@@ -409,7 +413,7 @@
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({ username, password, newPassword, primaryCompanyId, roleId, selectedCompanies: selectedCompanies })
+                    body: JSON.stringify({ username/*, password*/, newPassword, primaryCompanyId, roleId, selectedCompanies: selectedCompanies })
                 })
                     .then(response => response.json())
                     .then(data => {

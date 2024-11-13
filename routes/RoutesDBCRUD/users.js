@@ -80,7 +80,7 @@ routerUsers.post("/users/createUser", authenticateToken, async (req, res) => {
 
 routerUsers.put("/users/updateUser/:userId", authenticateToken, async (req, res) => {
     const { userId } = req.params;
-    const { username, password, newPassword, primaryCompanyId, roleId } = req.body;
+    const { username, newPassword, primaryCompanyId, roleId } = req.body;
     const userData = req.body;
 
     // Guardar las compañías seleccionadas en una constante y eliminar del objeto userData
@@ -98,12 +98,6 @@ routerUsers.put("/users/updateUser/:userId", authenticateToken, async (req, res)
         const user = await fetchOneFromTable('users', userId, 'user_id');
         if (!user) {
             return res.status(404).json({ message: "Usuario no encontrado" });
-        }
-
-        // Verificar la contraseña actual
-        const passwordMatch = await bcrypt.compare(password, user.password_hash);
-        if (!passwordMatch) {
-            return res.status(401).json({ message: "Contraseña actual incorrecta" });
         }
 
         // Preparar los datos para la actualización
@@ -152,6 +146,7 @@ routerUsers.put("/users/updateUser/:userId", authenticateToken, async (req, res)
         res.status(500).json({ message: "Error al actualizar el usuario" });
     }
 });
+
 
 
 routerUsers.put("/users/updateUserCompany/:userId", authenticateToken, async (req, res) => {
