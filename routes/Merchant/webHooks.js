@@ -135,8 +135,35 @@ routerWebHooks.post("/updatedProduct/:feedID", async (req, res) => {
   const productData = req.body;
   const productId = productData.data.id;
 
-  // Simulación de la obtención de datos del producto
-  const infoProductBigCommerce = await fetchProductById({ feedID }, productId);
+  const feed = await fetchOneFromTable("feeds", feedID, "feed_id");
+  
+
+  //console.log("-----------Producto Actualizado-----------");
+  //console.log("Feed: ", feed.feed_name);
+  //console.log("feedID: ", feedID);
+
+  const storeHash = feed.store_hash;
+  const accessToken = feed.x_auth_token;
+  const privateKey = feed.private_key;
+  const merchantId = feed.client_id;
+  const formula = feed.formulas;
+
+  const baseUrl = `https://api.bigcommerce.com/stores/${storeHash}/v3/catalog/products`;
+  const url = await buildQueryUrl(baseUrl, formula);
+
+  //console.log("Webhook recibido de actualizar productos");
+
+  const config = {
+    accessToken: accessToken,
+    storeHash: storeHash,
+    client_email: feed.client_email,
+    private_key: privateKey,
+    merchantId: merchantId,
+    domain: feed.domain,
+    apiInfo: url,
+  };
+
+  const infoProductBigCommerce = await fetchProductById(config, productId);
   
   if (!infoProductBigCommerce) {
     return res.status(404).send("Producto no encontrado en BigCommerce.");
@@ -146,7 +173,7 @@ routerWebHooks.post("/updatedProduct/:feedID", async (req, res) => {
   const precioDiferenteDeCero = infoProductBigCommerce.price !== 0;
   const esVisible = infoProductBigCommerce.is_visible;
   const disponibilidadNoDeshabilitada = infoProductBigCommerce.availability !== "disabled";
-  const tieneImagen = await checkCustomFieldFeed({ feedID }, productId);
+  const tieneImagen = await checkCustomFieldFeed(config, productId);
 
   // Imprimir en consola los resultados de los requisitos
   console.log("----------- Verificación de Requisitos del Producto Actualizado-----------");
@@ -163,18 +190,45 @@ routerWebHooks.post("/createdProduct/:feedID", async (req, res) => {
   const productData = req.body;
   const idProduct = productData.data.id;
 
-  // Simulación de la obtención de datos del producto
-  const product = await fetchProductById({ feedID }, idProduct);
+  const feed = await fetchOneFromTable("feeds", feedID, "feed_id");
   
-  if (!product) {
+
+  //console.log("-----------Producto Actualizado-----------");
+  //console.log("Feed: ", feed.feed_name);
+  //console.log("feedID: ", feedID);
+
+  const storeHash = feed.store_hash;
+  const accessToken = feed.x_auth_token;
+  const privateKey = feed.private_key;
+  const merchantId = feed.client_id;
+  const formula = feed.formulas;
+
+  const baseUrl = `https://api.bigcommerce.com/stores/${storeHash}/v3/catalog/products`;
+  const url = await buildQueryUrl(baseUrl, formula);
+
+  //console.log("Webhook recibido de actualizar productos");
+
+  const config = {
+    accessToken: accessToken,
+    storeHash: storeHash,
+    client_email: feed.client_email,
+    private_key: privateKey,
+    merchantId: merchantId,
+    domain: feed.domain,
+    apiInfo: url,
+  };
+
+  const infoProductBigCommerce = await fetchProductById(config, productId);
+  
+  if (!infoProductBigCommerce) {
     return res.status(404).send("Producto no encontrado en BigCommerce.");
   }
 
   // Verificación de los requisitos
-  const precioDiferenteDeCero = product.price !== 0;
-  const esVisible = product.is_visible;
-  const disponibilidadNoDeshabilitada = product.availability !== "disabled";
-  const tieneImagen = await checkCustomFieldFeed({ feedID }, idProduct);
+  const precioDiferenteDeCero = infoProductBigCommerce.price !== 0;
+  const esVisible = infoProductBigCommerce.is_visible;
+  const disponibilidadNoDeshabilitada = infoProductBigCommerce.availability !== "disabled";
+  const tieneImagen = await checkCustomFieldFeed(config, idProduct);
 
   // Imprimir en consola los resultados de los requisitos
   console.log("----------- Verificación de Requisitos del Producto Creado -----------");
