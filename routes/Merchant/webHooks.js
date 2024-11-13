@@ -218,7 +218,7 @@ routerWebHooks.post("/createdProduct/:feedID", async (req, res) => {
     apiInfo: url,
   };
 
-  const infoProductBigCommerce = await fetchProductById(config, productId);
+  const infoProductBigCommerce = await fetchProductById(config, idProduct);
   
   if (!infoProductBigCommerce) {
     return res.status(404).send("Producto no encontrado en BigCommerce.");
