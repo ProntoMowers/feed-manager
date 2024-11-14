@@ -4,6 +4,11 @@ const cron = require('node-cron');
 
 
 async function transformProduct(config, bcProduct) {
+
+  console.log("Información que llega: ", bcProduct)
+  console.log("Información que llega: ", config)
+
+
   const { getProductImages } = require("../api/imagesBigCommerceApi");
   const { fetchCategoryNameById, getStoreDomain , buildCategoryTrees } = require("../api/categoriesBigCommerceApi");
   const { getBrandNameById } = require("../api/productsBigCommerceApi");
