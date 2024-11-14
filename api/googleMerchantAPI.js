@@ -331,7 +331,7 @@ async function updateGoogleMerchantProduct(config, googleProductId, bcProduct) {
 
   console.log("Google Product Id: ", googleProductId);
 
-  const transformedProduct = await transformProduct(bcProduct);
+  const transformedProduct = await transformProduct(config, bcProduct);
   delete transformedProduct.offerId;
   delete transformedProduct.targetCountry;
   delete transformedProduct.contentLanguage;
