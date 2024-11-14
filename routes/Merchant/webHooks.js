@@ -190,6 +190,8 @@ routerWebHooks.post("/updatedProduct/:feedID", async (req, res) => {
     // Verificar si infoProductGoogle tiene la propiedad id
     if (infoProductGoogle && infoProductGoogle.id) {
       if (cumpleTodosLosRequisitos) {
+
+        console.log("Info Product BigCommerce:", infoProductBigCommerce)
         await updateGoogleMerchantProduct(config, infoProductGoogle.id, infoProductBigCommerce);
         console.log("Producto actualizado en Google Merchant.");
         return res.status(200).send("Producto actualizado en Google Merchant.");

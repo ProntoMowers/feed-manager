@@ -5,8 +5,8 @@ const cron = require('node-cron');
 
 async function transformProduct(config, bcProduct) {
 
-  console.log("Información que llega: ", bcProduct)
-  console.log("Información que llega: ", config)
+  console.log("Información que llega BC: ", bcProduct)
+  console.log("Información que llega Config: ", config)
 
 
   const { getProductImages } = require("../api/imagesBigCommerceApi");
