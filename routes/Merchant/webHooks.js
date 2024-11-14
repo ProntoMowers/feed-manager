@@ -189,9 +189,11 @@ routerWebHooks.post("/updatedProduct/:feedID", async (req, res) => {
       }
     }
 
+    console.log("Info Product Google: ", infoProductGoogle)
+
     if (infoProductGoogle) {
       if (cumpleTodosLosRequisitos) {
-        await updateGoogleMerchantProduct(config, infoProductBigCommerce,infoProductBigCommerce.sku);
+        await updateGoogleMerchantProduct(config,infoProductBigCommerce.sku,infoProductBigCommerce);
         console.log("Producto actualizado en Google Merchant.");
         return res.status(200).send("Producto actualizado en Google Merchant.");
       } else {
