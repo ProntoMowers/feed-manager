@@ -190,11 +190,11 @@ routerWebHooks.post("/updatedProduct/:feedID", async (req, res) => {
 
     if (infoProductGoogle) {
       if (cumpleTodosLosRequisitos) {
-        await updateGoogleMerchantProduct(config, infoProductGoogle.id, infoProductBigCommerce);
+        await updateGoogleMerchantProduct(config, infoProductBigCommerce.sku, infoProductBigCommerce);
         console.log("Producto actualizado en Google Merchant.");
         return res.status(200).send("Producto actualizado en Google Merchant.");
       } else {
-        await deleteGoogleMerchantProduct(config, infoProductGoogle.id);
+        await deleteGoogleMerchantProduct(config, infoProductBigCommerce.sku);
         console.log("Producto eliminado en Google Merchant debido a incumplimiento de requisitos.");
         return res.status(200).send("Producto eliminado en Google Merchant debido a incumplimiento de requisitos.");
       }
