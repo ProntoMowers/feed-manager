@@ -143,6 +143,9 @@ routerWebHooks.post("/updatedProduct/:feedID", async (req, res) => {
   const merchantId = feed.client_id;
   const formula = feed.formulas;
 
+
+  console.log("Tienda: ", feed.feed_name)
+
   const baseUrl = `https://api.bigcommerce.com/stores/${storeHash}/v3/catalog/products`;
   const url = await buildQueryUrl(baseUrl, formula);
 
@@ -171,7 +174,7 @@ routerWebHooks.post("/updatedProduct/:feedID", async (req, res) => {
     console.log(`Precio diferente de cero: ${precioDiferenteDeCero}`);
     console.log(`Producto es visible: ${esVisible}`);
     console.log(`Disponibilidad no deshabilitada: ${disponibilidadNoDeshabilitada}`);
-    console.log(`Cumple con Custom Fields: ${cumpleCustomFields}`);
+    console.log(`Cumple con Custom Fields y Tiene imagen: ${cumpleCustomFields}`);
 
     const cumpleTodosLosRequisitos = precioDiferenteDeCero && esVisible && disponibilidadNoDeshabilitada && cumpleCustomFields;
 
