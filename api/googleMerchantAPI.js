@@ -329,7 +329,7 @@ async function findProductByBigCommerceId(bigCommerceId) { // Asegúrate de reem
 async function updateGoogleMerchantProduct(config, googleProductId, bcProduct) {
   const { content, merchantId } = await initializeGoogleAuth(config);
 
-  //console.log("Google Product Id: ", googleProductId);
+  console.log("Google Product Id: ", googleProductId);
 
   const transformedProduct = await transformProduct(bcProduct);
   delete transformedProduct.offerId;
