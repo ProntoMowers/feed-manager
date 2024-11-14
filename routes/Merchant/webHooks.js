@@ -166,18 +166,27 @@ routerWebHooks.post("/updatedProduct/:feedID", async (req, res) => {
     const esVisible = infoProductBigCommerce.is_visible;
     const disponibilidadNoDeshabilitada = infoProductBigCommerce.availability !== "disabled";
     const tieneImagen = await checkCustomFieldFeed(config, productId);
-    const cumpleCustomFields = await checkCustomFieldFeed(config, productId); // Nuevo requisito
+    const cumpleCustomFields = await checkCustomFieldFeed(config, productId);
 
     console.log("----------- Verificación de Requisitos del Producto Actualizado -----------");
     console.log(`Precio diferente de cero: ${precioDiferenteDeCero}`);
     console.log(`Producto es visible: ${esVisible}`);
     console.log(`Disponibilidad no deshabilitada: ${disponibilidadNoDeshabilitada}`);
     console.log(`Imagen adecuada: ${tieneImagen}`);
-    console.log(`Cumple con Custom Fields: ${cumpleCustomFields}`); // Nuevo log
+    console.log(`Cumple con Custom Fields: ${cumpleCustomFields}`);
 
     const cumpleTodosLosRequisitos = precioDiferenteDeCero && esVisible && disponibilidadNoDeshabilitada && tieneImagen && cumpleCustomFields;
 
-    const infoProductGoogle = await getProductInfoGoogleMerchant(config, infoProductBigCommerce.sku);
+    let infoProductGoogle;
+    try {
+      infoProductGoogle = await getProductInfoGoogleMerchant(config, infoProductBigCommerce.sku);
+    } catch (error) {
+      if (error.code === 404) {
+        console.log("Producto no encontrado en Google Merchant, procediendo a creación.");
+      } else {
+        throw error;
+      }
+    }
 
     if (infoProductGoogle) {
       if (cumpleTodosLosRequisitos) {
@@ -205,6 +214,7 @@ routerWebHooks.post("/updatedProduct/:feedID", async (req, res) => {
     res.status(500).send("Error al procesar la solicitud de actualización de producto");
   }
 });
+
 
 
 
