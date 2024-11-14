@@ -136,11 +136,6 @@ routerWebHooks.post("/updatedProduct/:feedID", async (req, res) => {
   const productId = productData.data.id;
 
   const feed = await fetchOneFromTable("feeds", feedID, "feed_id");
-  
-
-  //console.log("-----------Producto Actualizado-----------");
-  //console.log("Feed: ", feed.feed_name);
-  //console.log("feedID: ", feedID);
 
   const storeHash = feed.store_hash;
   const accessToken = feed.x_auth_token;
@@ -150,8 +145,6 @@ routerWebHooks.post("/updatedProduct/:feedID", async (req, res) => {
 
   const baseUrl = `https://api.bigcommerce.com/stores/${storeHash}/v3/catalog/products`;
   const url = await buildQueryUrl(baseUrl, formula);
-
-  //console.log("Webhook recibido de actualizar productos");
 
   const config = {
     accessToken: accessToken,
@@ -163,27 +156,57 @@ routerWebHooks.post("/updatedProduct/:feedID", async (req, res) => {
     apiInfo: url,
   };
 
-  const infoProductBigCommerce = await fetchProductById(config, productId);
-  
-  if (!infoProductBigCommerce) {
-    return res.status(404).send("Producto no encontrado en BigCommerce.");
+  try {
+    const infoProductBigCommerce = await fetchProductById(config, productId);
+    if (!infoProductBigCommerce) {
+      return res.status(404).send("Producto no encontrado en BigCommerce.");
+    }
+
+    const precioDiferenteDeCero = infoProductBigCommerce.price !== 0;
+    const esVisible = infoProductBigCommerce.is_visible;
+    const disponibilidadNoDeshabilitada = infoProductBigCommerce.availability !== "disabled";
+    const tieneImagen = await checkCustomFieldFeed(config, productId);
+    const cumpleCustomFields = await checkCustomFieldFeed(config, productId); // Nuevo requisito
+
+    console.log("----------- Verificación de Requisitos del Producto Actualizado -----------");
+    console.log(`Precio diferente de cero: ${precioDiferenteDeCero}`);
+    console.log(`Producto es visible: ${esVisible}`);
+    console.log(`Disponibilidad no deshabilitada: ${disponibilidadNoDeshabilitada}`);
+    console.log(`Imagen adecuada: ${tieneImagen}`);
+    console.log(`Cumple con Custom Fields: ${cumpleCustomFields}`); // Nuevo log
+
+    const cumpleTodosLosRequisitos = precioDiferenteDeCero && esVisible && disponibilidadNoDeshabilitada && tieneImagen && cumpleCustomFields;
+
+    const infoProductGoogle = await getProductInfoGoogleMerchant(config, infoProductBigCommerce.sku);
+
+    if (infoProductGoogle) {
+      if (cumpleTodosLosRequisitos) {
+        await updateGoogleMerchantProduct(config, infoProductGoogle.id, infoProductBigCommerce);
+        console.log("Producto actualizado en Google Merchant.");
+        return res.status(200).send("Producto actualizado en Google Merchant.");
+      } else {
+        await deleteGoogleMerchantProduct(config, infoProductGoogle.id);
+        console.log("Producto eliminado en Google Merchant debido a incumplimiento de requisitos.");
+        return res.status(200).send("Producto eliminado en Google Merchant debido a incumplimiento de requisitos.");
+      }
+    } else {
+      if (cumpleTodosLosRequisitos) {
+        const transformedProduct = await transformProduct(config, infoProductBigCommerce);
+        await insertProductToGoogleMerchant(config, transformedProduct);
+        console.log("Producto creado en Google Merchant con éxito.");
+        return res.status(200).send("Producto creado y sincronizado correctamente con Google Merchant.");
+      } else {
+        console.log("Producto no cumple con los requisitos para ser creado en Google Merchant.");
+        return res.status(200).send("Producto no cumple con los requisitos para ser creado en Google Merchant.");
+      }
+    }
+  } catch (error) {
+    console.error("Error al procesar la solicitud de actualización de producto en Google Merchant: ", error);
+    res.status(500).send("Error al procesar la solicitud de actualización de producto");
   }
-
-  // Verificación de los requisitos
-  const precioDiferenteDeCero = infoProductBigCommerce.price !== 0;
-  const esVisible = infoProductBigCommerce.is_visible;
-  const disponibilidadNoDeshabilitada = infoProductBigCommerce.availability !== "disabled";
-  const tieneImagen = await checkCustomFieldFeed(config, productId);
-
-  // Imprimir en consola los resultados de los requisitos
-  console.log("----------- Verificación de Requisitos del Producto Actualizado-----------");
-  console.log(`Precio diferente de cero: ${precioDiferenteDeCero}`);
-  console.log(`Producto es visible: ${esVisible}`);
-  console.log(`Disponibilidad no deshabilitada: ${disponibilidadNoDeshabilitada}`);
-  console.log(`Imagen adecuada: ${tieneImagen}`);
-
-  res.status(200).send("Requisitos del producto verificados en consola.");
 });
+
+
 
 routerWebHooks.post("/createdProduct/:feedID", async (req, res) => {
   const { feedID } = req.params;
@@ -191,11 +214,6 @@ routerWebHooks.post("/createdProduct/:feedID", async (req, res) => {
   const idProduct = productData.data.id;
 
   const feed = await fetchOneFromTable("feeds", feedID, "feed_id");
-  
-
-  //console.log("-----------Producto Actualizado-----------");
-  //console.log("Feed: ", feed.feed_name);
-  //console.log("feedID: ", feedID);
 
   const storeHash = feed.store_hash;
   const accessToken = feed.x_auth_token;
@@ -205,8 +223,6 @@ routerWebHooks.post("/createdProduct/:feedID", async (req, res) => {
 
   const baseUrl = `https://api.bigcommerce.com/stores/${storeHash}/v3/catalog/products`;
   const url = await buildQueryUrl(baseUrl, formula);
-
-  //console.log("Webhook recibido de actualizar productos");
 
   const config = {
     accessToken: accessToken,
@@ -218,27 +234,43 @@ routerWebHooks.post("/createdProduct/:feedID", async (req, res) => {
     apiInfo: url,
   };
 
-  const infoProductBigCommerce = await fetchProductById(config, idProduct);
-  
-  if (!infoProductBigCommerce) {
-    return res.status(404).send("Producto no encontrado en BigCommerce.");
+  try {
+    const infoProductBigCommerce = await fetchProductById(config, idProduct);
+    if (!infoProductBigCommerce) {
+      return res.status(404).send("Producto no encontrado en BigCommerce.");
+    }
+
+    const precioDiferenteDeCero = infoProductBigCommerce.price !== 0;
+    const esVisible = infoProductBigCommerce.is_visible;
+    const disponibilidadNoDeshabilitada = infoProductBigCommerce.availability !== "disabled";
+    const tieneImagen = await checkCustomFieldFeed(config, idProduct);
+    const cumpleCustomFields = await checkCustomFieldFeed(config, idProduct); // Nuevo requisito
+
+    console.log("----------- Verificación de Requisitos del Producto Creado -----------");
+    console.log(`Precio diferente de cero: ${precioDiferenteDeCero}`);
+    console.log(`Producto es visible: ${esVisible}`);
+    console.log(`Disponibilidad no deshabilitada: ${disponibilidadNoDeshabilitada}`);
+    console.log(`Imagen adecuada: ${tieneImagen}`);
+    console.log(`Cumple con Custom Fields: ${cumpleCustomFields}`); // Nuevo log
+
+    const cumpleTodosLosRequisitos = precioDiferenteDeCero && esVisible && disponibilidadNoDeshabilitada && tieneImagen && cumpleCustomFields;
+
+    if (cumpleTodosLosRequisitos) {
+      const transformedProduct = await transformProduct(config, infoProductBigCommerce);
+      await insertProductToGoogleMerchant(config, transformedProduct);
+      console.log("Producto creado en Google Merchant con éxito.");
+      return res.status(200).send("Producto creado y sincronizado correctamente con Google Merchant.");
+    } else {
+      console.log("Producto no cumple con los requisitos para ser creado en Google Merchant.");
+      return res.status(200).send("Producto no cumple con los requisitos para ser creado en Google Merchant.");
+    }
+  } catch (error) {
+    console.error("Error al procesar la solicitud de creación de producto en Google Merchant: ", error);
+    res.status(500).send("Error al procesar la solicitud de creación de producto");
   }
-
-  // Verificación de los requisitos
-  const precioDiferenteDeCero = infoProductBigCommerce.price !== 0;
-  const esVisible = infoProductBigCommerce.is_visible;
-  const disponibilidadNoDeshabilitada = infoProductBigCommerce.availability !== "disabled";
-  const tieneImagen = await checkCustomFieldFeed(config, idProduct);
-
-  // Imprimir en consola los resultados de los requisitos
-  console.log("----------- Verificación de Requisitos del Producto Creado -----------");
-  console.log(`Precio diferente de cero: ${precioDiferenteDeCero}`);
-  console.log(`Producto es visible: ${esVisible}`);
-  console.log(`Disponibilidad no deshabilitada: ${disponibilidadNoDeshabilitada}`);
-  console.log(`Imagen adecuada: ${tieneImagen}`);
-
-  res.status(200).send("Requisitos del producto creado verificados en consola.");
 });
+
+
 
 
 
