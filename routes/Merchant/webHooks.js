@@ -165,17 +165,15 @@ routerWebHooks.post("/updatedProduct/:feedID", async (req, res) => {
     const precioDiferenteDeCero = infoProductBigCommerce.price !== 0;
     const esVisible = infoProductBigCommerce.is_visible;
     const disponibilidadNoDeshabilitada = infoProductBigCommerce.availability !== "disabled";
-    const tieneImagen = await checkCustomFieldFeed(config, productId);
-    const cumpleCustomFields = await checkCustomFieldFeed(config, productId);
+    const cumpleCustomFields = await checkCustomFieldFeed(config, productId); // Llamada única a checkCustomFieldFeed
 
     console.log("----------- Verificación de Requisitos del Producto Actualizado -----------");
     console.log(`Precio diferente de cero: ${precioDiferenteDeCero}`);
     console.log(`Producto es visible: ${esVisible}`);
     console.log(`Disponibilidad no deshabilitada: ${disponibilidadNoDeshabilitada}`);
-    console.log(`Imagen adecuada: ${tieneImagen}`);
     console.log(`Cumple con Custom Fields: ${cumpleCustomFields}`);
 
-    const cumpleTodosLosRequisitos = precioDiferenteDeCero && esVisible && disponibilidadNoDeshabilitada && tieneImagen && cumpleCustomFields;
+    const cumpleTodosLosRequisitos = precioDiferenteDeCero && esVisible && disponibilidadNoDeshabilitada && cumpleCustomFields;
 
     let infoProductGoogle;
 
@@ -189,11 +187,10 @@ routerWebHooks.post("/updatedProduct/:feedID", async (req, res) => {
       }
     }
 
-    //console.log("Info Product Google: ", infoProductGoogle)
-
-    if (infoProductGoogle) {
+    // Verificar si infoProductGoogle tiene la propiedad id
+    if (infoProductGoogle && infoProductGoogle.id) {
       if (cumpleTodosLosRequisitos) {
-        await updateGoogleMerchantProduct(config,infoProductGoogle.id,infoProductBigCommerce);
+        await updateGoogleMerchantProduct(config, infoProductGoogle.id, infoProductBigCommerce);
         console.log("Producto actualizado en Google Merchant.");
         return res.status(200).send("Producto actualizado en Google Merchant.");
       } else {
@@ -201,7 +198,7 @@ routerWebHooks.post("/updatedProduct/:feedID", async (req, res) => {
         console.log("Producto eliminado en Google Merchant debido a incumplimiento de requisitos.");
         return res.status(200).send("Producto eliminado en Google Merchant debido a incumplimiento de requisitos.");
       }
-    } else {
+    } else if (!infoProductGoogle) {
       if (cumpleTodosLosRequisitos) {
         const transformedProduct = await transformProduct(config, infoProductBigCommerce);
         await insertProductToGoogleMerchant(config, transformedProduct);
@@ -211,12 +208,16 @@ routerWebHooks.post("/updatedProduct/:feedID", async (req, res) => {
         console.log("Producto no cumple con los requisitos para ser creado en Google Merchant.");
         return res.status(200).send("Producto no cumple con los requisitos para ser creado en Google Merchant.");
       }
+    } else {
+      console.error("Error: La información del producto de Google no contiene un 'id'.");
+      return res.status(500).send("Error: La información del producto de Google no contiene un 'id'.");
     }
   } catch (error) {
     console.error("Error al procesar la solicitud de actualización de producto en Google Merchant: ", error);
     res.status(500).send("Error al procesar la solicitud de actualización de producto");
   }
 });
+
 
 
 
