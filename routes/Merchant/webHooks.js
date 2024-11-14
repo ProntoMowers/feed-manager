@@ -178,6 +178,7 @@ routerWebHooks.post("/updatedProduct/:feedID", async (req, res) => {
     const cumpleTodosLosRequisitos = precioDiferenteDeCero && esVisible && disponibilidadNoDeshabilitada && tieneImagen && cumpleCustomFields;
 
     let infoProductGoogle;
+
     try {
       infoProductGoogle = await getProductInfoGoogleMerchant(config, infoProductBigCommerce.sku);
     } catch (error) {
@@ -190,7 +191,7 @@ routerWebHooks.post("/updatedProduct/:feedID", async (req, res) => {
 
     if (infoProductGoogle) {
       if (cumpleTodosLosRequisitos) {
-        await updateGoogleMerchantProduct(config, infoProductBigCommerce.sku, infoProductBigCommerce);
+        await updateGoogleMerchantProduct(config, infoProductBigCommerce,infoProductBigCommerce.sku);
         console.log("Producto actualizado en Google Merchant.");
         return res.status(200).send("Producto actualizado en Google Merchant.");
       } else {
