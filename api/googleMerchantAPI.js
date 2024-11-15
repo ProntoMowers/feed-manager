@@ -329,7 +329,7 @@ async function findProductByBigCommerceId(bigCommerceId) { // Asegúrate de reem
 async function updateGoogleMerchantProduct(config, googleProductId, bcProduct) {
   const { content, merchantId } = await initializeGoogleAuth(config);
 
-  console.log("Google Product Id: ", googleProductId);
+  //console.log("Google Product Id: ", googleProductId);
 
   const transformedProduct = await transformProduct(config, bcProduct);
   delete transformedProduct.offerId;
@@ -346,7 +346,7 @@ async function updateGoogleMerchantProduct(config, googleProductId, bcProduct) {
       // Por ejemplo: updateMask: 'title,link'
     });
 
-    console.log("Producto actualizado con éxito:", response.data.id);
+    //console.log("Producto actualizado con éxito:", response.data.id);
     return response.data;
   } catch (error) {
     console.error("Error al actualizar el producto:", error);
