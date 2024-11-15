@@ -71,7 +71,8 @@ async function transformProduct(config, bcProduct) {
   } else if (bcProduct.fixed_cost_shipping_price > 0) {
     const shippingCost = bcProduct.fixed_cost_shipping_price;
     googleProductFormat.customLabel0 = 
-      shippingCost < 10 ? "fixed-10" :
+      shippingCost < 4 ? "fixed-10-" :
+      shippingCost < 10 ? "fixed-4-10" :
       shippingCost < 30 ? "fixed-10-30" :
       shippingCost < 50 ? "fixed-30-50" :
       shippingCost < 100 ? "fixed-50-100" :
