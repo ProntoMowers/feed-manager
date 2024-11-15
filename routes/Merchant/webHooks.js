@@ -144,7 +144,7 @@ routerWebHooks.post("/updatedProduct/:feedID", async (req, res) => {
   const formula = feed.formulas;
 
 
-  console.log("Tienda: ", feed.feed_name)
+  //console.log("Tienda: ", feed.feed_name)
 
   const baseUrl = `https://api.bigcommerce.com/stores/${storeHash}/v3/catalog/products`;
   const url = await buildQueryUrl(baseUrl, formula);
@@ -170,11 +170,11 @@ routerWebHooks.post("/updatedProduct/:feedID", async (req, res) => {
     const disponibilidadNoDeshabilitada = infoProductBigCommerce.availability !== "disabled";
     const cumpleCustomFields = await checkCustomFieldFeed(config, productId); // Llamada única a checkCustomFieldFeed
 
-    console.log("----------- Verificación de Requisitos del Producto Actualizado -----------");
-    console.log(`Precio diferente de cero: ${precioDiferenteDeCero}`);
-    console.log(`Producto es visible: ${esVisible}`);
-    console.log(`Disponibilidad no deshabilitada: ${disponibilidadNoDeshabilitada}`);
-    console.log(`Cumple con Custom Fields y Tiene imagen: ${cumpleCustomFields}`);
+    //console.log("----------- Verificación de Requisitos del Producto Actualizado -----------");
+    //console.log(`Precio diferente de cero: ${precioDiferenteDeCero}`);
+    //console.log(`Producto es visible: ${esVisible}`);
+    //console.log(`Disponibilidad no deshabilitada: ${disponibilidadNoDeshabilitada}`);
+    //console.log(`Cumple con Custom Fields y Tiene imagen: ${cumpleCustomFields}`);
 
     const cumpleTodosLosRequisitos = precioDiferenteDeCero && esVisible && disponibilidadNoDeshabilitada && cumpleCustomFields;
 
@@ -184,7 +184,7 @@ routerWebHooks.post("/updatedProduct/:feedID", async (req, res) => {
       infoProductGoogle = await getProductInfoGoogleMerchant(config, infoProductBigCommerce.sku);
     } catch (error) {
       if (error.code === 404) {
-        console.log("Producto no encontrado en Google Merchant, procediendo a creación.");
+        //console.log("Producto no encontrado en Google Merchant, procediendo a creación.");
       } else {
         throw error;
       }
@@ -195,21 +195,21 @@ routerWebHooks.post("/updatedProduct/:feedID", async (req, res) => {
       if (cumpleTodosLosRequisitos) {
 
         await updateGoogleMerchantProduct(config, infoProductGoogle.id, infoProductBigCommerce);
-        console.log("Producto actualizado en Google Merchant.");
+        //console.log("Producto actualizado en Google Merchant.");
         return res.status(200).send("Producto actualizado en Google Merchant.");
       } else {
         await deleteGoogleMerchantProduct(config, infoProductGoogle.id);
-        console.log("Producto eliminado en Google Merchant debido a incumplimiento de requisitos.");
+        //console.log("Producto eliminado en Google Merchant debido a incumplimiento de requisitos.");
         return res.status(200).send("Producto eliminado en Google Merchant debido a incumplimiento de requisitos.");
       }
     } else if (!infoProductGoogle) {
       if (cumpleTodosLosRequisitos) {
         const transformedProduct = await transformProduct(config, infoProductBigCommerce);
         await insertProductToGoogleMerchant(config, transformedProduct);
-        console.log("Producto creado en Google Merchant con éxito.");
+        //console.log("Producto creado en Google Merchant con éxito.");
         return res.status(200).send("Producto creado y sincronizado correctamente con Google Merchant.");
       } else {
-        console.log("Producto no cumple con los requisitos para ser creado en Google Merchant.");
+        //console.log("Producto no cumple con los requisitos para ser creado en Google Merchant.");
         return res.status(200).send("Producto no cumple con los requisitos para ser creado en Google Merchant.");
       }
     } else {
