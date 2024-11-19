@@ -264,22 +264,22 @@ routerWebHooks.post("/createdProduct/:feedID", async (req, res) => {
     const tieneImagen = await checkCustomFieldFeed(config, idProduct);
     const cumpleCustomFields = await checkCustomFieldFeed(config, idProduct); // Nuevo requisito
 
-    console.log("----------- Verificación de Requisitos del Producto Creado -----------");
-    console.log(`Precio diferente de cero: ${precioDiferenteDeCero}`);
-    console.log(`Producto es visible: ${esVisible}`);
-    console.log(`Disponibilidad no deshabilitada: ${disponibilidadNoDeshabilitada}`);
-    console.log(`Imagen adecuada: ${tieneImagen}`);
-    console.log(`Cumple con Custom Fields: ${cumpleCustomFields}`); // Nuevo log
+    //console.log("----------- Verificación de Requisitos del Producto Creado -----------");
+    //console.log(`Precio diferente de cero: ${precioDiferenteDeCero}`);
+    //console.log(`Producto es visible: ${esVisible}`);
+    //console.log(`Disponibilidad no deshabilitada: ${disponibilidadNoDeshabilitada}`);
+    //console.log(`Imagen adecuada: ${tieneImagen}`);
+    //console.log(`Cumple con Custom Fields: ${cumpleCustomFields}`); // Nuevo log
 
     const cumpleTodosLosRequisitos = precioDiferenteDeCero && esVisible && disponibilidadNoDeshabilitada && tieneImagen && cumpleCustomFields;
 
     if (cumpleTodosLosRequisitos) {
       const transformedProduct = await transformProduct(config, infoProductBigCommerce);
       await insertProductToGoogleMerchant(config, transformedProduct);
-      console.log("Producto creado en Google Merchant con éxito.");
+      //console.log("Producto creado en Google Merchant con éxito.");
       return res.status(200).send("Producto creado y sincronizado correctamente con Google Merchant.");
     } else {
-      console.log("Producto no cumple con los requisitos para ser creado en Google Merchant.");
+      //console.log("Producto no cumple con los requisitos para ser creado en Google Merchant.");
       return res.status(200).send("Producto no cumple con los requisitos para ser creado en Google Merchant.");
     }
   } catch (error) {
