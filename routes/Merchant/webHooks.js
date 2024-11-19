@@ -277,10 +277,10 @@ routerWebHooks.post("/createdProduct/:feedID", async (req, res) => {
       const transformedProduct = await transformProduct(config, infoProductBigCommerce);
       await insertProductToGoogleMerchant(config, transformedProduct);
       //console.log("Producto creado en Google Merchant con éxito.");
-      return res.status(200).send("Producto creado y sincronizado correctamente con Google Merchant.");
+      //return res.status(200).send("Producto creado y sincronizado correctamente con Google Merchant.");
     } else {
       //console.log("Producto no cumple con los requisitos para ser creado en Google Merchant.");
-      return res.status(200).send("Producto no cumple con los requisitos para ser creado en Google Merchant.");
+      //return res.status(200).send("Producto no cumple con los requisitos para ser creado en Google Merchant.");
     }
   } catch (error) {
     console.error("Error al procesar la solicitud de creación de producto en Google Merchant: ", error);

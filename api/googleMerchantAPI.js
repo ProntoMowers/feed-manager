@@ -415,7 +415,7 @@ async function getProductInfoGoogleMerchant(config, productId) {
 async function deleteGoogleMerchantProduct(config, googleProductId) {
   const { content, merchantId } = await initializeGoogleAuth(config);
 
-  console.log("SKU recibido desde Info Google Merchant: ", googleProductId);
+  //console.log("SKU recibido desde Info Google Merchant: ", googleProductId);
 
   try {
     const response = await content.products.delete({
@@ -426,7 +426,7 @@ async function deleteGoogleMerchantProduct(config, googleProductId) {
     console.log("Producto eliminado con éxito:", response.data);
     return response.data;
   } catch (error) {
-    console.error("Error al eliminar el producto:", error);
+    //console.error("Error al eliminar el producto:", error);
     throw error;
   }
 }
