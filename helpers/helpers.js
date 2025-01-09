@@ -85,7 +85,8 @@ async function transformProduct(config, bcProduct) {
   const productPrice = (bcProduct.sale_price && bcProduct.sale_price > 0) ? bcProduct.sale_price : bcProduct.price || bcProduct.calculated_price;
 
 // Clasificación del precio en Custom Label 2
-  googleProductFormat.customLabel2 = productPrice < 10 ? "10-" 
+googleProductFormat.customLabel2 = productPrice < 4 ? "4-" 
+    : productPrice < 10 ? "4-10" 
     : productPrice < 30 ? "10-30" 
     : productPrice < 50 ? "30-50" 
     : productPrice < 100 ? "50-100" 
