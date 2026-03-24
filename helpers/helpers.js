@@ -19,6 +19,8 @@ async function transformProduct(config, bcProduct) {
 
   //console.log("Dominio: ", config.domain)
 
+  const storeDomain = (config.domain || "").replace(/\/+$/, "");
+
   // Configura aquí las propiedades que son comunes entre BigCommerce y Google Merchant Center
   const googleProductFormat = {
     offerId: bcProduct.sku,
@@ -27,7 +29,8 @@ async function transformProduct(config, bcProduct) {
     //imageLink: `<g:image_link>${primerImagen.url_standard}</g:image_link>`,
     contentLanguage: "en",
     targetCountry: "us",
-    link: `${config.domain}${bcProduct.custom_url.url}`,
+    link: `${storeDomain}${bcProduct.custom_url.url}`,
+    checkoutLinkTemplate: `${storeDomain}/cart.php?action=add&product_id=${bcProduct.id}`,
     channel: "online",
     googleProductCategory: 'Home & Garden', // Ejemplo, debería ser específico para tu producto
     condition: bcProduct.condition,
