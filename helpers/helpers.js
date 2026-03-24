@@ -30,7 +30,6 @@ async function transformProduct(config, bcProduct) {
     contentLanguage: "en",
     targetCountry: "us",
     link: `${storeDomain}${bcProduct.custom_url.url}`,
-    checkout_link_template: `${storeDomain}/cart.php?action=add&product_id=${bcProduct.id}`,
     channel: "online",
     googleProductCategory: 'Home & Garden', // Ejemplo, debería ser específico para tu producto
     condition: bcProduct.condition,
