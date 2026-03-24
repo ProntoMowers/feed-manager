@@ -61,8 +61,11 @@ async function transformProduct(config, bcProduct) {
     googleProductFormat.customLabel4 = "disabled ";
   }else if (bcProduct.availability === "available") {
     //console.log("Producto con Preorder")
+    const customFields = await getCustomFields(config, bcProduct.id);
+    const invField = customFields.find(field => field.name === "__inv");
+    const invValue = typeof invField?.value === "string" ? invField.value.trim().toLowerCase() : "";
 
-    googleProductFormat.customLabel4 = "available";
+    googleProductFormat.customLabel4 = invValue === "y" ? "available1" : "available";
   }
 
   // Implementación de Custom Label 0 para el envío gratuito y con costos específicos
