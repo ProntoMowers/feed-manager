@@ -381,13 +381,16 @@
                     },
                     body: JSON.stringify(feedData)
                 })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.message === "Feed actualizado con éxito") {
+                    .then(async response => {
+                        const data = await response.json().catch(() => ({}));
+                        return { ok: response.ok, data };
+                    })
+                    .then(({ ok, data }) => {
+                        if (ok) {
                             alert("Feed actualizado con éxito");
                             window.location.href = "/app/feeds";
                         } else {
-                            alert("Error al actualizar el feed: " + data.message);
+                            alert("Error al actualizar el feed: " + (data.message || "Error desconocido"));
                             window.location.reload();
                         }
                     })

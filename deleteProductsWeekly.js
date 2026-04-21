@@ -1,6 +1,6 @@
 const { listAllProductIds } = require("./api/googleMerchantAPI")
 const { manageDeleteProductsProcessing, countPages } = require("./api/productsBigCommerceApi")
-const { fetchOneFromTable } = require("./databases/CRUD");
+const { fetchOneFromTable, fetchDataFromTable } = require("./databases/CRUD");
 
 
 async function deleteFeedCron(feedId) {
@@ -31,17 +31,40 @@ async function deleteFeedCron(feedId) {
 }
 
 
-// Obtener el feedId desde los argumentos de la línea de comandos
-const args = process.argv.slice(2);
-const feedId = args[0];
+async function deleteAllFeedsWeekly() {
+    const feeds = await fetchDataFromTable('feeds');
 
-if (!feedId) {
-    console.error('Error: FEED_ID no proporcionado');
-    process.exit(1);
+    if (!feeds || feeds.length === 0) {
+        console.log('No hay feeds para procesar.');
+        return;
+    }
+
+    for (const feed of feeds) {
+        try {
+            console.log(`Procesando limpieza semanal para feed ${feed.feed_id}...`);
+            await deleteFeedCron(feed.feed_id);
+        } catch (error) {
+            console.error(`Error procesando feed ${feed.feed_id}:`, error.message);
+        }
+    }
 }
 
-// Simulación de la ejecución del cron
-deleteFeedCron(feedId).catch(error => {
-    console.error('Error en deleteFeedCron:', error.message);
-    process.exit(1);
-});
+
+// Obtener el feedId desde los argumentos de la línea de comandos
+const args = process.argv.slice(2);
+const feedId = args[0] || process.env.FEED_ID;
+
+if (feedId) {
+    // Ejecutar para un feed específico
+    deleteFeedCron(feedId).catch(error => {
+        console.error('Error en deleteFeedCron:', error.message);
+        process.exit(1);
+    });
+} else {
+    // Si no viene FEED_ID, ejecutar para todos los feeds activos
+    console.warn('FEED_ID no proporcionado. Se procesarán todos los feeds.');
+    deleteAllFeedsWeekly().catch(error => {
+        console.error('Error en deleteAllFeedsWeekly:', error.message);
+        process.exit(1);
+    });
+}
