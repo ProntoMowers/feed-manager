@@ -42,9 +42,9 @@ handlebars.registerHelper('includes', function(array, value) {
 // Configurar opciones SSL
 
 const sslOptions = {
-  key: fs.readFileSync(path.join(__dirname, '../../', 'secrets/prontoproyect/prontomowers.app.key')),  // Clave privada
-  cert: fs.readFileSync(path.join(__dirname, '../../', 'secrets/prontoproyect/prontomowers.app.pem')),  // Certificado público
-  ca: fs.readFileSync(path.join(__dirname, '../../', 'secrets/prontoproyect/gd_bundle-g2-g1.crt'))      // Certificados intermedios
+  key: fs.readFileSync(path.join(__dirname, '..', 'secrets/prontoproyect/prontomowers.app.key')),  // Clave privada
+  cert: fs.readFileSync(path.join(__dirname, '..', 'secrets/prontoproyect/prontomowers.app.pem')),  // Certificado público
+  ca: fs.readFileSync(path.join(__dirname, '..', 'secrets/prontoproyect/gd_bundle-g2-g1.crt'))      // Certificados intermedios
 };
 
 
