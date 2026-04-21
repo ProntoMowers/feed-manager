@@ -43,7 +43,7 @@ handlebars.registerHelper('includes', function(array, value) {
 
 const sslOptions = {
   key: fs.readFileSync(path.join(__dirname, '../..', 'secrets/prontoproyect/prontomowers.app.key')),  // Clave privada
-  cert: fs.readFileSync(path.join(__dirname, '../..', 'secrets/prontoproyect/419ea13d145120f0.pem')),  // Certificado público
+  cert: fs.readFileSync(path.join(__dirname, '../..', 'secrets/prontoproyect/prontomowers.app.pem')),  // Certificado público
   ca: fs.readFileSync(path.join(__dirname, '../..', 'secrets/prontoproyect/gd_bundle-g2-g1.crt'))      // Certificados intermedios
 };
 
